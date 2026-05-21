@@ -1,0 +1,9 @@
+{
+  "key": "clear_lane",
+  "title": "Пустая полоса / эталон",
+  "description": "Без препятствий: контроль длины 12 м и времени завершения.",
+  "bench_focus": "reference_completion",
+  "mission_length_m": 12.0,
+  "corridor_width_m": 2.4,
+  "obstacles": []
+}

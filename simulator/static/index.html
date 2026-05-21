@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Swarm Formation Mission Simulator v6.3</title>
+  <script src="https://unpkg.com/cytoscape@3.28.1/dist/cytoscape.min.js"></script>
+  <style>
+    :root{--bg:#07101b;--panel:#0d1724;--panel2:#101d2c;--line:#2a3e59;--text:#d7e2f1;--muted:#8ca3bd;--accent:#64b5f6;--ok:#46d18c;--warn:#f4c542;--bad:#ff6b6b;--blue:#4fb3ff}
+    *{box-sizing:border-box} html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+    button,input,select,textarea{font:inherit;color:var(--text)} button{background:#173050;border:1px solid #31557c;border-radius:7px;padding:7px 10px;cursor:pointer} button:hover{background:#214367}.primary{background:#176044;border-color:#35a977}.warn{background:#66511c;border-color:#a48925}.bad{background:#5d252c;border-color:#b04a57}
+    input,select,textarea{background:#07111f;border:1px solid #2b496a;border-radius:6px;padding:6px;width:100%} textarea{resize:vertical;min-height:82px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px} label{display:block;font-size:12px;color:var(--muted);margin-top:8px}.hint{color:var(--muted);font-size:12px;line-height:1.38}.small{font-size:12px}.mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+    .topbar{height:44px;display:flex;align-items:center;gap:12px;padding:0 12px;border-bottom:1px solid var(--line);background:#081321}.title{font-weight:800;color:#e7f2ff;white-space:nowrap}.status{color:var(--muted);font-size:12px;min-width:180px}.phasebar{display:flex;gap:6px;min-width:0;overflow-x:auto}.phasebtn{font-size:12px;white-space:nowrap;padding:6px 9px;background:#0d1e32}.phasebtn.active{background:#26507c;border-color:#64b5f6}
+    #layout{height:calc(100vh - 44px);display:grid;grid-template-columns:minmax(360px,430px) minmax(420px,1fr) minmax(340px,410px);min-width:980px}.panel{background:var(--panel);border-right:1px solid var(--line);min-height:0;display:flex;flex-direction:column}.panel.right{border-right:none;border-left:1px solid var(--line)}.phase{display:none;overflow:auto;padding:10px;min-height:0;flex:1}.phase.active{display:block}.section{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:10px;background:rgba(255,255,255,.025)}.section h3{margin:0 0 8px;font-size:14px}.section h4{margin:8px 0 5px;font-size:13px;color:#dbeeff}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}.row{display:flex;gap:8px;align-items:center;margin:7px 0;flex-wrap:wrap}.row>*{flex:1}.toolbar{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:8px}.toolbar>*{flex:0 0 auto}.tabs{display:flex;flex-wrap:wrap;gap:4px;padding:7px;border-bottom:1px solid var(--line);background:#0a1422;flex:0 0 auto}.tabbtn{padding:5px 7px;font-size:12px;background:#0d1e32}.tabbtn.active{background:#26507c;border-color:#64b5f6}.rtab{display:none;overflow:auto;padding:10px;min-height:0;flex:1}.rtab.active{display:block}.scrollbox{max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:7px;background:#081321}.canvasWrap{position:relative;background:#070d16;min-height:0;overflow:hidden}#cy{position:absolute;inset:0}.canvasToolbar{position:absolute;top:10px;left:10px;z-index:5;display:flex;gap:6px;background:rgba(7,13,22,.86);border:1px solid var(--line);border-radius:10px;padding:6px}.canvasToolbar button{padding:4px 8px}.legend{position:absolute;left:10px;right:10px;bottom:10px;z-index:5;color:var(--muted);font-size:12px;background:rgba(7,13,22,.82);border:1px solid var(--line);border-radius:10px;padding:8px;max-width:760px}
+    table{width:100%;border-collapse:collapse;font-size:12px}th,td{border:1px solid #263b55;padding:4px 5px;text-align:right}th{background:#102035;color:#bcd1e8;position:sticky;top:0}td.left,th.left{text-align:left}.ok{color:var(--ok)}.warnText{color:var(--warn)}.badText{color:var(--bad)}.cellWarn{background:rgba(244,197,66,.24)}.cellBad{background:rgba(255,107,107,.28)}.pill,.badge{display:inline-block;border:1px solid #355d85;border-radius:999px;padding:2px 7px;font-size:11px;color:#cfe3f7;background:#11243a;margin:2px}.badge.off{border-color:#6b4d2e;color:#f4d29b;background:#332316}.check{display:flex;align-items:center;gap:8px;margin:6px 0;color:var(--text)}.check input{width:auto}.modal{position:fixed;inset:0;background:rgba(0,0,0,.64);z-index:30;display:none;align-items:center;justify-content:center;padding:22px}.modal.active{display:flex}.modalContent{width:min(1320px,96vw);height:min(880px,92vh);background:#0a1422;border:1px solid #4b6d91;border-radius:13px;box-shadow:0 22px 80px rgba(0,0,0,.45);display:flex;flex-direction:column;min-height:0}.modalHeader{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line)}.modalBody{padding:12px;overflow:auto;min-height:0;flex:1}.modalGrid{display:grid;grid-template-columns:minmax(360px,1fr) minmax(380px,1fr);gap:12px;min-height:0}.wideGrid{display:grid;grid-template-columns:minmax(300px,.8fr) minmax(420px,1.2fr);gap:12px}.matrixInput{width:70px;padding:2px;font-size:11px;text-align:right}.hidden{display:none}#formationCy{height:430px;border:1px solid var(--line);border-radius:9px;background:#07101b}.card{border:1px solid #263b55;border-radius:9px;padding:9px;margin-bottom:8px;background:#0b1726}.card.active{border-color:#64b5f6;background:#102746}.card h4{margin:0 0 5px}.refs a{color:#9ed0ff;display:block;margin:4px 0;text-decoration:none}.dangerZone{border-color:#743141;background:rgba(116,49,65,.14)}pre{white-space:pre-wrap;margin:0;padding:8px}.measureOn{outline:2px solid var(--warn)}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="title">Swarm Formation Mission Simulator v6.3</div>
+    <div class="phasebar" id="phaseBar">
+      <button class="phasebtn active" data-phase="phaseScene">1. Начальное состояние</button>
+      <button class="phasebtn" data-phase="phaseModel">2. Параметры моделирования</button>
+      <button class="phasebtn" data-phase="phaseRun">3. Запуск и визуализация</button>
+      <button class="phasebtn" data-phase="phaseBench">4. Бенчмарки</button>
+      <button class="phasebtn" data-phase="phaseAnalysis">5. Анализ алгоритмов</button>
+    </div>
+    <div id="topStatus" class="status">готов</div>
+  </div>
+  <div id="layout">
+    <aside class="panel">
+      <div class="phase active" id="phaseScene">
+        <div class="section">
+          <h3>Сцена: геометрия, измерения, физика покрытия</h3>
+          <div class="grid2">
+            <div><label>Длина трека миссии, м</label><input id="missionLength" type="number" step="0.1" value="12"></div>
+            <div><label>Макс. ширина полосы, м</label><input id="corridorWidth" type="number" step="0.1" value="2.4"></div>
+            <div><label>Старт X, м</label><input id="startX" type="number" step="0.1" value="0"></div>
+            <div><label>Старт Y, м</label><input id="startY" type="number" step="0.1" value="0"></div>
+          </div>
+          <div class="toolbar"><button id="measureBtn" onclick="toggleMeasure()">Измерить расстояние</button><button onclick="clearMeasure()">Сброс измерения</button><button class="primary" onclick="applyInitialConditions('сцена')">Apply сцена/НУ</button></div>
+          <div id="measureInfo" class="hint">Кнопка измерения: затем кликните две точки на поле.</div>
+          <h4>Физика сцены</h4>
+          <div class="grid3">
+            <div><label>Тип покрытия</label><select id="surfaceType"><option value="smooth_floor">smooth_floor</option><option value="mat">mat</option><option value="carpet">carpet</option><option value="rough">rough</option><option value="custom">custom</option></select></div>
+            <div><label>Трение μ</label><input id="friction" type="number" step="0.05" value="0.85"></div>
+            <div><label>Rolling resistance</label><input id="rolling" type="number" step="0.005" value="0.02"></div>
+            <div><label>speed scale</label><input id="surfaceSpeed" type="number" step="0.05" value="1.0"></div>
+            <div><label>accel scale</label><input id="surfaceAccel" type="number" step="0.05" value="1.0"></div>
+            <div><label>energy scale</label><input id="surfaceEnergy" type="number" step="0.1" value="1.0"></div>
+          </div>
+        </div>
+        <div class="section">
+          <h3>Начальная формация: известная сетка → правка</h3>
+          <div class="grid3">
+            <div><label>Строй</label><select id="formationShape"><option>triangle</option><option>square</option><option>hex</option><option>circle</option><option>line</option><option>custom</option></select></div>
+            <div><label>N агентов</label><input id="nAgents" type="number" min="1" max="80" value="7"></div>
+            <div><label>Шаг сетки, м</label><input id="formationSpacing" type="number" step="0.05" value="0.38"></div>
+          </div>
+          <div class="toolbar"><button onclick="loadFormationPreset()">Загрузить preset</button><button onclick="alignFormation()">Выровнять по сетке</button><button class="primary" onclick="openFormationModal()">Редактор графа и D[i,j]</button><button onclick="applyInitialConditions('строй')">Apply строй</button></div>
+          <div id="formationSummary" class="hint"></div>
+        </div>
+        <div class="section">
+          <h3>Препятствия и сценарий появления</h3>
+          <label>Предопределённая карта для benchmark</label><select id="obstacleMapPreset"></select>
+          <div class="toolbar"><button onclick="loadObstacleMap()">Загрузить карту</button><button onclick="clearObstacles()">Очистить</button><button class="primary" onclick="openObstacleModal()">Редактор препятствий</button><button onclick="applyInitialConditions('препятствия')">Apply препятствия</button></div>
+          <h4>Random</h4>
+          <div class="grid3">
+            <div><label>count</label><input id="randomObsCount" type="number" value="6" min="0" max="100"></div>
+            <div><label>seed</label><input id="randomObsSeed" type="number" value="42"></div>
+            <div><label>динамика: 0..1 / % / count</label><input id="randomObsDynamic" type="number" step="0.05" value="0.25" min="0"></div>
+            <div><label>тип</label><select id="randomObsKind"><option value="rectangle">rectangle</option><option value="circle">circle</option><option value="mixed">mixed</option></select></div>
+            <div><label>типоразмер</label><select id="randomObsSize" onchange="applyRandomObstacleSizePreset()"><option value="small">small</option><option value="medium" selected>medium</option><option value="large">large</option><option value="custom">custom</option></select></div>
+            <div><label>min gap, м</label><input id="randomObsGap" type="number" step="0.05" value="0.55"></div>
+          </div>
+          <details style="margin-top:6px"><summary class="hint">Точные диапазоны типоразмера</summary>
+            <div class="grid2">
+              <div><label>width min, м</label><input id="randomObsWMin" type="number" step="0.05" value="0.40"></div>
+              <div><label>width max, м</label><input id="randomObsWMax" type="number" step="0.05" value="0.75"></div>
+              <div><label>height min, м</label><input id="randomObsHMin" type="number" step="0.05" value="0.30"></div>
+              <div><label>height max, м</label><input id="randomObsHMax" type="number" step="0.05" value="0.65"></div>
+            </div>
+          </details>
+          <div class="toolbar"><button onclick="generateRandomObstacles()">Сгенерировать random-препятствия</button><button onclick="openObstacleModal()">Открыть редактор</button><button onclick="applyInitialConditions('random obstacles')">Apply random</button></div>
+          <div id="randomObsStatus" class="hint"></div>
+          <h4>Быстро добавить прямоугольник</h4>
+          <div class="grid3">
+            <div><label>x центра</label><input id="quickObsX" type="number" step="0.1" value="5.0"></div>
+            <div><label>y центра</label><input id="quickObsY" type="number" step="0.1" value="0.0"></div>
+            <div><label>ширина</label><input id="quickObsW" type="number" step="0.05" value="0.55"></div>
+            <div><label>высота</label><input id="quickObsH" type="number" step="0.05" value="0.45"></div>
+            <div><label>появление, с</label><input id="quickObsAppear" type="number" step="0.1" value="0"></div>
+            <div><label>исчезновение, с</label><input id="quickObsDisappear" type="number" step="0.1" placeholder="пусто"></div>
+          </div>
+          <button onclick="quickAddRectangle()">Добавить</button>
+          <h4>Текущие препятствия</h4>
+          <div id="obstaclesList" class="scrollbox"></div>
+          <div class="hint">Клик по препятствию на поле или кнопка edit открывают свойства. Изменение карты/генерация сбрасывает текущий запуск, чтобы симуляция не шла по старой сцене.</div>
+        </div>
+        <div class="section">
+          <h3>Агенты: физические свойства</h3>
+          <div class="hint">Правый клик по агенту на канвасе или кнопка в списке открывает свойства. Сначала все агенты одинаковые.</div>
+          <div id="agentsList" class="scrollbox"></div><div class="toolbar"><button onclick="applyInitialConditions('агенты')">Apply агенты</button></div>
+        </div>
+        <div class="section">
+          <h3>Импорт / экспорт параметров сцены</h3>
+          <div class="grid2"><button onclick="downloadCurrentConfig()">Скачать JSON</button><label class="buttonLike">Импорт JSON<input id="importFile" type="file" accept="application/json" onchange="importConfigFile(event)"></label></div>
+          <label>Контрольный пример</label><select id="exampleSelect"></select>
+          <div class="toolbar"><button onclick="loadSelectedExample()">Загрузить пример</button></div>
+        </div>
+      </div>
+
+      <div class="phase" id="phaseModel">
+        <div class="section">
+          <h3>Модель: централизованная/агентная, цель, алгоритм</h3>
+          <label>Алгоритм, одинаковый для всех агентов</label><select id="algorithm" onchange="onAlgorithmSelect()"></select>
+          <div id="algorithmInfo" class="hint"></div>
+          <div class="toolbar"><button class="primary" onclick="openAlgorithmModal()">Подробное описание / редактор</button><button onclick="applyInitialConditions('модель')">Apply модель</button></div>
+          <label>Целевая функция миссии</label><select id="objectiveFunction"></select>
+          <div id="objectiveInfo" class="hint"></div>
+          <div class="grid2">
+            <div><label>Режим восприятия</label><select id="perceptionMode"><option value="local">local</option><option value="global_debug">global_debug</option></select></div>
+            <div><label>Shared memory</label><select id="sharedMemory"><option value="true">true</option><option value="false">false</option></select></div>
+            <div><label>Broadcast obstacles</label><select id="broadcastObstacles"><option value="true">true</option><option value="false">false</option></select></div>
+            <div><label>Broadcast positions</label><select id="broadcastPositions"><option value="true">true</option><option value="false">false</option></select></div>
+            <div><label>Obstacle memory, s</label><input id="obstacleMemory" type="number" step="1" value="12"></div>
+            <div><label>Comms range, m</label><input id="commsRange" type="number" step="0.1" value="4"></div>
+          </div>
+        </div>
+        <div class="section">
+          <h3>Ограничения движения, перестроения и safety filter</h3>
+          <div class="grid3">
+            <div><label>grid resolution, m</label><input id="gridResolution" type="number" step="0.01" value="0.12"></div>
+            <div><label>safety margin, m</label><input id="safetyMargin" type="number" step="0.01" value="0.055"></div>
+            <div><label>obstacle margin, m</label><input id="obstacleMargin" type="number" step="0.01" value="0.05"></div>
+            <div><label>robot-robot margin, m</label><input id="robotMargin" type="number" step="0.01" value="0.04"></div>
+            <div><label>max reconfig speed, m/s</label><input id="reconfigSpeed" type="number" step="0.01" value="0.30"></div>
+            <div><label>replan period, steps</label><input id="replanPeriod" type="number" step="1" value="3"></div>
+            <div><label>setpoint smoothing α</label><input id="setpointAlpha" type="number" step="0.05" value="0.70"></div>
+            <div><label>setpoint max rate, m/s</label><input id="setpointRate" type="number" step="0.05" value="0.55"></div>
+            <div><label>avoidance horizon, s</label><input id="avoidanceHorizon" type="number" step="0.1" value="1.2"></div>
+          </div>
+          <label class="check"><input id="smoothReconf" type="checkbox" checked> плавное перестроение</label>
+          <label class="check"><input id="enableSafety" type="checkbox" checked> predictive safety filter</label>
+          <label class="check"><input id="allowReverse" type="checkbox" checked> разрешить задний ход</label><label class="check"><input id="keepFullTrails" type="checkbox" checked> не стирать хвосты от старта</label>
+        </div>
+      </div>
+
+      <div class="phase" id="phaseRun">
+        <div class="section">
+          <h3>Запуск симуляции</h3>
+          <div class="grid3">
+            <div><label>dt, с</label><input id="dt" type="number" step="0.05" value="0.20"></div>
+            <div><label>max steps</label><input id="maxSteps" type="number" step="10" value="900"></div>
+            <div><label>seed</label><input id="seed" type="number" value="42"></div>
+          </div>
+          <div class="toolbar"><button onclick="applyInitialConditions('параметры времени')">Apply время</button><button class="primary" onclick="createMission()">Создать / пересоздать</button><button onclick="stepSim(1)">Шаг</button><button onclick="stepSim(10)">10 шагов</button><button onclick="stepUntilDone()">До финиша</button><button id="autoBtn" onclick="toggleAuto()">Авто</button><button onclick="applyDragged()">Применить drag</button></div>
+          <label>Шагов за auto tick</label><input id="autoSteps" type="number" value="1" min="1" max="200">
+          <div class="hint">Если вы изменили сцену, строй, препятствия или физику, пересоздайте миссию. Drag машинок и препятствий применяйте отдельной кнопкой.</div>
+        </div>
+        <div class="section">
+          <h3>Визуализация обтекания</h3>
+          <label class="check"><input id="showRoutes" type="checkbox" onchange="renderCanvas()"> локальный план обхода</label>
+          <label class="check"><input id="showFullRoutes" type="checkbox" onchange="renderCanvas()"> полный путь до финиша</label>
+          <label class="check"><input id="showAgentTrails" type="checkbox" checked onchange="renderCanvas()"> индивидуальные следы агентов</label>
+          <label class="check"><input id="showTargets" type="checkbox" checked onchange="renderCanvas()"> текущие setpoint и финальные слоты</label>
+          <label class="check"><input id="showInactiveObs" type="checkbox" checked onchange="renderCanvas()"> показывать будущие/неактивные препятствия</label>
+          <label class="check"><input id="showSonar" type="checkbox" checked onchange="renderCanvas()"> показывать лучи соника и точку попадания</label>
+          <div id="clusterProcessInfo" class="hint"></div>
+        </div>
+        <div class="section">
+          <h3>1 машинка: физический маршрут</h3>
+          <div class="toolbar"><button onclick="makeSingleAgentMission()">Сделать N=1</button><button onclick="computeSingleOptimal()">Построить оптимальный маршрут</button></div>
+          <pre id="singleResult" class="scrollbox small"></pre>
+        </div>
+      </div>
+
+      <div class="phase" id="phaseBench">
+        <div class="section">
+          <h3>Benchmark: алгоритмы × карта × seed</h3>
+          <label>Карта бенча</label><select id="benchMapSelect"></select>
+          <div class="toolbar"><button onclick="loadBenchMapToScene()">Применить карту к сцене</button><button class="primary" onclick="runBenchmark()">Запустить benchmark</button></div>
+          <div id="benchAlgorithms" class="scrollbox" style="padding:8px"></div>
+          <div class="grid2"><div><label>seeds, через запятую</label><input id="benchSeeds" value="1,2,3"></div><div><label>max steps bench</label><input id="benchMaxSteps" type="number" value="900"></div></div>
+          <pre id="benchmarkOutput" class="scrollbox small"></pre>
+        </div>
+        <div class="section">
+          <h3>Сравнение с физическими g-логами</h3>
+          <textarea id="physicalLogInput" rows="8" placeholder="r01: ts=[1784462000], tracks=[+00000, +00000], sonic=[+000, -001cm], ..."></textarea>
+          <div class="toolbar"><button onclick="replayPhysicalLog()">Replay g-лога</button><button onclick="downloadGLog()">Скачать текущий g.log</button></div>
+          <pre id="physicalReplayOutput" class="scrollbox small"></pre>
+        </div>
+      </div>
+
+      <div class="phase" id="phaseAnalysis">
+        <div class="section">
+          <h3>Анализ алгоритмов и логов</h3>
+          <div class="toolbar"><button onclick="openAlgorithmModal()">Каталог алгоритмов</button><button onclick="downloadCsv()">Скачать CSV</button><button onclick="downloadTankCommands()">Скачать команды танка</button><button onclick="downloadGLog()">Скачать g.log</button><button class="primary" onclick="downloadLogsZip()">Скачать все логи ZIP</button><button onclick="refreshGLog()">Обновить g</button></div>
+          <div id="analysisText" class="hint"></div>
+        </div>
+        <div class="section">
+          <h3>Полная конфигурация</h3>
+          <textarea id="fullConfigJson" rows="18"></textarea>
+          <div class="toolbar"><button onclick="applyFullConfigJson()">Применить JSON как черновик</button><button onclick="downloadCurrentConfig()">Скачать JSON</button></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="canvasWrap">
+      <div id="cy"></div>
+      <div class="canvasToolbar"><button onclick="zoomCanvas(1.18)">+</button><button onclick="zoomCanvas(0.85)">−</button><button onclick="fitCanvas()">Fit</button><button onclick="centerCanvas()">Center</button><button onclick="resetCanvasZoom()">Reset</button></div>
+      <div class="legend">Pan — перетаскивание пустого поля, zoom — колесо или кнопки. Клик по агенту — онлайн-статус, правый клик — свойства. Клик по препятствию — свойства. Белая точка — текущий setpoint, зелёный ромб — финальный слот, пунктир — маршрут обхода, цветной пунктирный луч — что сейчас видит соник агента.</div>
+    </main>
+
+    <aside class="panel right">
+      <div class="tabs" id="rightTabs"><button class="tabbtn active" data-tab="metricsTab">Summary</button><button class="tabbtn" data-tab="initialTab">НУ</button><button class="tabbtn" data-tab="matrixTab">Матрицы</button><button class="tabbtn" data-tab="agentsTabR">Агенты</button><button class="tabbtn" data-tab="onlineTab">Онлайн</button><button class="tabbtn" data-tab="decisionTab">Решения</button><button class="tabbtn" data-tab="logsTabR">Логи</button></div>
+      <div class="rtab active" id="metricsTab"><div id="metricsBox"></div></div>
+      <div class="rtab" id="initialTab"><div id="initialBox"></div></div>
+      <div class="rtab" id="matrixTab"><div id="matrixBox"></div></div>
+      <div class="rtab" id="agentsTabR"><div id="agentMetricsBox"></div></div>
+      <div class="rtab" id="onlineTab"><div id="onlineAgentBox" class="hint">Кликните по машинке левой кнопкой.</div></div>
+      <div class="rtab" id="decisionTab"><pre id="decisionBox" class="scrollbox small"></pre></div>
+      <div class="rtab" id="logsTabR"><div class="toolbar"><button onclick="downloadCsv()">CSV</button><button onclick="downloadTankCommands()">tank CSV</button><button onclick="downloadGLog()">g.log</button><button class="primary" onclick="downloadLogsZip()">ZIP</button><button onclick="refreshGLog()">Обновить g</button></div><div id="logsInfo" class="hint" style="margin:8px 0"></div><pre id="gLog" class="scrollbox small"></pre></div>
+    </aside>
+  </div>
+
+  <div class="modal" id="formationModal"><div class="modalContent"><div class="modalHeader"><strong>Редактор формации: preset → граф → матрица расстояний</strong><button onclick="closeModal('formationModal')">Закрыть</button></div><div class="modalBody"><div class="section"><div class="grid3"><div><label>Тип сетки</label><select id="formationModalShape"><option>triangle</option><option>square</option><option>hex</option><option>circle</option><option>line</option></select></div><div><label>N</label><input id="formationModalN" type="number" value="7"></div><div><label>Шаг</label><input id="formationModalSpacing" type="number" step="0.05" value="0.38"></div></div><div class="toolbar"><button onclick="formationLoadPresetInModal()">Загрузить preset</button><button onclick="formationAddNode()">Добавить агента в сетку</button><button onclick="formationAlignToModalGrid()">Выровнять по сетке</button><button onclick="formationRecomputeMatrix(true)">D из графа</button><button onclick="formationMarkCustom()">custom</button></div></div><div class="modalGrid"><div><div id="formationCy"></div><div class="toolbar"><button class="bad" onclick="formationRemoveSelected()">Удалить выбранного</button><button onclick="formationFit()">Fit</button><button onclick="formationValidateModal()">Валидировать</button><button class="primary" onclick="formationApplyModal()">Применить в миссию</button></div><div id="formationModalStatus" class="hint"></div></div><div><h3>Матрица расстояний D[i,j], м</h3><div id="formationMatrixEditor" class="scrollbox" style="max-height:540px"></div><div class="hint">Строй формально задаёт D[i,j]. Координаты графа — embedding для старта и финальных слотов; D проверяет восстановление строя.</div></div></div></div></div></div>
+
+  <div class="modal" id="obstacleModal"><div class="modalContent"><div class="modalHeader"><strong>Редактор препятствий и сценариев появления</strong><button onclick="closeModal('obstacleModal')">Закрыть</button></div><div class="modalBody"><div class="wideGrid"><div class="section"><h3>Добавить препятствие</h3><div class="grid3"><div><label>kind</label><select id="obsKind"><option value="rectangle">rectangle</option><option value="circle">circle</option><option value="polygon">polygon</option></select></div><div><label>x</label><input id="obsX" type="number" step="0.1" value="5"></div><div><label>y</label><input id="obsY" type="number" step="0.1" value="0"></div><div><label>width</label><input id="obsW" type="number" step="0.05" value="0.55"></div><div><label>height</label><input id="obsH" type="number" step="0.05" value="0.45"></div><div><label>radius</label><input id="obsR" type="number" step="0.05" value="0.25"></div><div><label>appear</label><input id="obsAppear" type="number" step="0.1" value="0"></div><div><label>disappear</label><input id="obsDisappear" type="number" step="0.1" placeholder="пусто"></div><div><label>label</label><input id="obsLabel" value="rect"></div></div><label>vertices для polygon, относительно центра</label><textarea id="obsVertices" rows="4">[{"x":-0.3,"y":-0.2},{"x":0.3,"y":-0.2},{"x":0.0,"y":0.25}]</textarea><div class="toolbar"><button onclick="obstacleAddFromModal()">Добавить</button><button onclick="obstacleValidateModal()">Валидировать</button><button class="primary" onclick="obstacleApplyModal()">Применить</button></div><div id="obstacleModalStatus" class="hint"></div></div><div><h3>Список препятствий</h3><div id="obstacleListEditor" class="scrollbox" style="max-height:220px"></div><h3>ObstacleSpec[] JSON</h3><textarea id="obstacleModalJson" rows="18"></textarea></div></div></div></div></div>
+
+  <div class="modal" id="agentModal"><div class="modalContent" style="width:min(680px,96vw);height:auto;max-height:92vh"><div class="modalHeader"><strong>Свойства агента</strong><button onclick="closeModal('agentModal')">Закрыть</button></div><div class="modalBody"><input id="agentEditId" class="hidden"><div class="grid2"><div><label>Имя</label><input id="agentName"></div><div><label>powered</label><select id="agentPowered"><option value="true">true</option><option value="false">false</option></select></div><div><label>длина, м</label><input id="agentLength" type="number" step="0.01"></div><div><label>ширина, м</label><input id="agentWidth" type="number" step="0.01"></div><div><label>collision radius, м</label><input id="agentRadius" type="number" step="0.01"></div><div><label>mass, кг</label><input id="agentMass" type="number" step="0.05"></div><div><label>max speed, м/с</label><input id="agentSpeed" type="number" step="0.01"></div><div><label>max accel, м/с²</label><input id="agentAccel" type="number" step="0.05"></div><div><label>wheel base, м</label><input id="agentWheel" type="number" step="0.01"></div><div><label>sonic range, м</label><input id="agentSonic" type="number" step="0.1"></div><div><label>energy coeff</label><input id="agentEnergy" type="number" step="0.1"></div><div><label>цвет</label><input id="agentColor" type="color"></div></div><div class="toolbar"><button class="primary" onclick="saveAgentModal()">Сохранить</button><button onclick="closeModal('agentModal')">Отмена</button></div></div></div></div>
+
+  <div class="modal" id="obstacleEditModal"><div class="modalContent" style="width:min(760px,96vw);height:auto;max-height:92vh"><div class="modalHeader"><strong>Свойства препятствия</strong><button onclick="closeModal('obstacleEditModal')">Закрыть</button></div><div class="modalBody"><input id="obsEditId" class="hidden"><div class="grid3"><div><label>id</label><input id="obsEditIdVisible" readonly></div><div><label>label</label><input id="obsEditLabel"></div><div><label>kind</label><select id="obsEditKind"><option value="rectangle">rectangle</option><option value="circle">circle</option><option value="polygon">polygon</option></select></div><div><label>x</label><input id="obsEditX" type="number" step="0.05"></div><div><label>y</label><input id="obsEditY" type="number" step="0.05"></div><div><label>rotation deg</label><input id="obsEditRotation" type="number" step="1"></div><div><label>width</label><input id="obsEditW" type="number" step="0.05"></div><div><label>height</label><input id="obsEditH" type="number" step="0.05"></div><div><label>radius</label><input id="obsEditR" type="number" step="0.05"></div><div><label>appear, s</label><input id="obsEditAppear" type="number" step="0.1"></div><div><label>disappear, s</label><input id="obsEditDisappear" type="number" step="0.1" placeholder="пусто"></div><div><label>opacity</label><input id="obsEditOpacity" type="number" step="0.05" min="0.05" max="1"></div></div><label>vertices для polygon</label><textarea id="obsEditVertices" rows="5"></textarea><div class="toolbar"><button class="primary" onclick="saveObstacleEditModal()">Применить</button><button class="bad" onclick="deleteObstacleFromEditModal()">Удалить</button></div></div></div></div>
+
+  <div class="modal" id="algorithmModal"><div class="modalContent"><div class="modalHeader"><strong>Алгоритмы: объяснимость, ссылки, параметры</strong><button onclick="closeModal('algorithmModal')">Закрыть</button></div><div class="modalBody"><div class="modalGrid"><div><div class="section"><h3>Список алгоритмов</h3><div id="algorithmCards" class="scrollbox" style="max-height:690px;padding:8px"></div></div></div><div><div class="section"><h3 id="algorithmEditorTitle">Алгоритм</h3><div id="algorithmEditorDescription" class="hint"></div><h4>Шаги решения</h4><ol id="algorithmSteps" class="hint"></ol><h4>Входы / выходы</h4><div id="algorithmIO" class="hint"></div><h4>Параметры алгоритма JSON</h4><input id="algorithmEditorKey" class="hidden"><textarea id="algorithmParamsJson" rows="10"></textarea><h4>Ссылки</h4><div id="algorithmRefs" class="refs"></div><div class="toolbar"><button class="primary" onclick="applyAlgorithmModal()">Применить алгоритм</button><button onclick="resetAlgorithmParamsFromMeta()">Параметры по умолчанию</button></div></div><div class="section"><h3>Важно</h3><div class="hint">Целевая функция миссии выбирается отдельно в фазе 2. Один и тот же алгоритм может запускаться с finish_first, min_makespan, shortest_centroid, min_total_energy или balanced.</div></div></div></div></div></div></div>
+
+<script>
+const S=95;
+let cy=null, formationCy=null, state=null, simId=null, autoTimer=null;
+let dragPatch={robots:{},obstacles:{}};
+let config=defaultConfig();
+let algorithms=[], candidates=[], objectives=[], obstacleMaps=[], examples=[];
+let selectedAlgorithmKey='smooth_adaptive_clusters';
+let measureMode=false, measurePoints=[];
+let selectedAgentId=null, agentStatusTimer=null;
+let singleOptimalPath=[], replayPath=[];
+let autoFitNextRender=true;
+
+function defaultConfig(){return {name:'mission_v6',mission_length_m:12,corridor_width_m:2.4,start_x_m:0,start_y_m:0,dt_s:0.20,max_steps:900,seed:42,algorithm:'smooth_adaptive_clusters',algorithm_params:{},grid_resolution_m:0.12,n_agents:7,formation_shape:'triangle',formation_spacing_m:0.38,formation:null,agents:null,obstacles:[],random_obstacles:false,random_obstacle_count:0,scene_physics:{surface_type:'smooth_floor',friction_coefficient:0.85,rolling_resistance:0.02,speed_scale:1,accel_scale:1,energy_scale:1,note:''},perception:{mode:'local',shared_memory:true,obstacle_memory_s:12,comms_range_m:4,broadcast_obstacles:true,broadcast_positions:true},objective:{objective_function:'finish_first',completion_policy:'finish_first',collective_goal_weight:1,agent_survival_weight:1,final_place_weight:1,energy_weight:0.2,time_weight:0.25,centroid_length_weight:0.25,allow_reassignment:false,require_all_powered_agents:true,success_requires_formation:true,success_requires_no_collision:false},limits:{safety_margin_m:0.055,robot_robot_margin_m:0.04,obstacle_margin_m:0.05,replan_period_steps:3,max_reconfig_speed_mps:0.30,smooth_reconfiguration:true,setpoint_smoothing_alpha:0.70,setpoint_max_rate_mps:0.55,min_route_lookahead_m:0.30,route_preview_points:28,agent_trail_points:140,keep_full_trails:true,completion_unstuck_speed_mps:0.055,cluster_hysteresis_steps:2,avoidance_horizon_s:1.2,enable_safety_filter:true,allow_reverse:true,stop_if_no_path:false},default_agent:{id:'default',name:'default',powered:true,length_m:0.18,width_m:0.13,radius_m:null,mass_kg:0.35,wheel_base_m:0.16,max_speed_mps:0.38,max_reverse_mps:0.12,max_omega_radps:3.2,max_accel_mps2:0.55,max_omega_accel_radps2:5.5,max_power:1000,power_to_speed:0.00038,tank_pwm_min:4000,tank_pwm_step:1000,tank_pwm_period:20000,pwm_correction_left:0,pwm_correction_right:0,energy_coeff:1,sonic_range_m:4,sonic_fov_deg:80,camera_pan_deg:0,camera_tilt_deg:0,color:'#4fb3ff'},finish_centroid_tolerance_m:0.18,finish_agent_tolerance_m:0.16};}
+function $(id){return document.getElementById(id)}
+function setStatus(t){$('topStatus').textContent=t}
+function deepCopy(o){return JSON.parse(JSON.stringify(o))}
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function num(id, fallback=0, min=null, max=null){let v=Number($(id)?.value); if(!Number.isFinite(v)) v=fallback; if(min!==null) v=Math.max(min,v); if(max!==null) v=Math.min(max,v); return v}
+function round(x,n=3){return Math.round(Number(x)*10**n)/10**n}
+function invalidateSimulation(reason='сцена изменена'){simId=null;state=null;dragPatch={robots:{},obstacles:{}};autoFitNextRender=true;setStatus(reason+', создайте/запустите миссию заново')}
+function m2cy(p){return {x:p.x*S,y:-p.y*S}}
+function cy2m(p){return {x:p.x/S,y:-p.y/S}}
+async function api(url,opts={}){const res=await fetch(url,{headers:{'Content-Type':'application/json'},...opts}); if(!res.ok){throw new Error(await res.text())} return await res.json()}
+function openModal(id){$(id).classList.add('active')} function closeModal(id){$(id).classList.remove('active')}
+function activateRightTab(tab){const c=$('rightTabs');if(!c)return;c.querySelectorAll('.tabbtn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));document.querySelectorAll('.rtab').forEach(t=>t.classList.toggle('active',t.id===tab));}
+async function applyInitialConditions(scope='НУ'){syncConfigFromForms();await ensureFormation(false);state=null;simId=null;dragPatch={robots:{},obstacles:{}};autoFitNextRender=true;renderAll();activateRightTab('initialTab');setStatus(`apply: ${scope}; НУ применены на канвас, запуск сброшен`)}
+
+function setupPhaseTabs(){document.querySelectorAll('.phasebtn').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.phasebtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.phase').forEach(p=>p.classList.remove('active'));$(btn.dataset.phase).classList.add('active')}));}
+function setupRightTabs(){const c=$('rightTabs');c.querySelectorAll('.tabbtn').forEach(btn=>btn.addEventListener('click',()=>{c.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));$(btn.dataset.tab).classList.add('active')}));}
+
+async function init(){setupPhaseTabs();setupRightTabs();initCanvas();await loadCatalogs();await loadExamplesIndex();syncFormsFromConfig();await ensureFormation(false);renderAll();setStatus('готов');}
+async function loadCatalogs(){try{const cat=await api('/api/algorithms/catalog');algorithms=cat.algorithms||[];candidates=cat.candidates||[];objectives=cat.objective_functions||[];populateAlgorithms();populateObjectives();}catch(e){setStatus('ошибка catalog: '+e.message)}try{const maps=await api('/api/obstacle-maps');obstacleMaps=maps.maps||[];populateMaps();}catch(e){}}
+function populateAlgorithms(){const opts=algorithms.map(a=>`<option value="${a.key}">${escapeHtml(a.label||a.key)}</option>`).join('');$('algorithm').innerHTML=opts;$('algorithm').value=config.algorithm;renderAlgorithmInfo();const checks=algorithms.map(a=>`<label class="check"><input type="checkbox" class="benchAlg" value="${a.key}" ${a.standard?'checked':''}> ${escapeHtml(a.label||a.key)} <span class="badge">${escapeHtml(a.family||'')}</span></label>`).join('');$('benchAlgorithms').innerHTML=checks;}
+function populateObjectives(){if(!objectives.length){objectives=[{key:'finish_first',label:'Сначала завершить',description:''},{key:'min_makespan',label:'Минимум времени',description:''},{key:'shortest_centroid',label:'Кратчайший центр',description:''},{key:'min_total_energy',label:'Минимум энергии',description:''},{key:'balanced',label:'Баланс',description:''}]};$('objectiveFunction').innerHTML=objectives.map(o=>`<option value="${o.key}">${escapeHtml(o.label)}</option>`).join('');}
+function populateMaps(){const opts=obstacleMaps.map(m=>`<option value="${m.key}">${escapeHtml(m.title||m.key)}</option>`).join('');$('obstacleMapPreset').innerHTML=opts;$('benchMapSelect').innerHTML=opts;}
+async function loadExamplesIndex(){try{const data=await api('/api/examples');examples=data.examples||[];$('exampleSelect').innerHTML=examples.map((e,i)=>`<option value="${i}">${escapeHtml(e.title||e.name||e.config)}</option>`).join('')}catch(e){$('exampleSelect').innerHTML=''}}
+
+function syncConfigFromForms(){config.mission_length_m=num('missionLength',12,0.1);config.corridor_width_m=num('corridorWidth',2.4,0.1);config.start_x_m=num('startX',0);config.start_y_m=num('startY',0);let dt=num('dt',0.2,0.01,2);if(dt>2)dt=0.2;config.dt_s=dt;config.max_steps=Math.max(1,Math.round(num('maxSteps',900,1)));config.seed=Math.round(num('seed',42));config.grid_resolution_m=num('gridResolution',0.12,0.03,1);config.n_agents=Math.max(1,Math.round(num('nAgents',7,1,80)));config.formation_shape=$('formationShape').value;config.formation_spacing_m=num('formationSpacing',0.38,0.05,3);config.algorithm=$('algorithm').value||config.algorithm;selectedAlgorithmKey=config.algorithm;config.objective=config.objective||{};config.objective.objective_function=$('objectiveFunction').value||'finish_first';const alias={min_makespan:'min_time_all_powered',min_total_energy:'min_energy'};config.objective.completion_policy=alias[config.objective.objective_function]||config.objective.objective_function;config.scene_physics={surface_type:$('surfaceType').value,friction_coefficient:num('friction',0.85,0.05,3),rolling_resistance:num('rolling',0.02,0,1),speed_scale:num('surfaceSpeed',1,0.05,3),accel_scale:num('surfaceAccel',1,0.05,3),energy_scale:num('surfaceEnergy',1,0.05,10),note:''};config.perception={mode:$('perceptionMode').value,shared_memory:$('sharedMemory').value==='true',obstacle_memory_s:num('obstacleMemory',12,0),comms_range_m:num('commsRange',4,0),broadcast_obstacles:$('broadcastObstacles').value==='true',broadcast_positions:$('broadcastPositions').value==='true'};config.limits={...(config.limits||{}),safety_margin_m:num('safetyMargin',0.055,0),obstacle_margin_m:num('obstacleMargin',0.05,0),robot_robot_margin_m:num('robotMargin',0.04,0),max_reconfig_speed_mps:num('reconfigSpeed',0.30,0.01),replan_period_steps:Math.max(1,Math.round(num('replanPeriod',3,1))),setpoint_smoothing_alpha:num('setpointAlpha',0.70,0.01,1),setpoint_max_rate_mps:num('setpointRate',0.55,0.01),avoidance_horizon_s:num('avoidanceHorizon',1.2,0.05),smooth_reconfiguration:$('smoothReconf').checked,enable_safety_filter:$('enableSafety').checked,allow_reverse:$('allowReverse').checked,keep_full_trails:$('keepFullTrails')?$('keepFullTrails').checked:true,completion_unstuck_speed_mps:config.limits?.completion_unstuck_speed_mps??0.055};}
+function syncFormsFromConfig(){const c=config;$('missionLength').value=c.mission_length_m??12;$('corridorWidth').value=c.corridor_width_m??2.4;$('startX').value=c.start_x_m??0;$('startY').value=c.start_y_m??0;$('dt').value=c.dt_s??0.2;$('maxSteps').value=c.max_steps??900;$('seed').value=c.seed??42;$('gridResolution').value=c.grid_resolution_m??0.12;$('nAgents').value=c.n_agents||c.formation?.nodes?.length||1;$('formationShape').value=c.formation_shape||'triangle';$('formationSpacing').value=c.formation_spacing_m??0.38;$('algorithm').value=c.algorithm||'smooth_adaptive_clusters';$('objectiveFunction').value=c.objective?.objective_function||revObjective(c.objective?.completion_policy)||'finish_first';const p=c.scene_physics||{};$('surfaceType').value=p.surface_type||'smooth_floor';$('friction').value=p.friction_coefficient??0.85;$('rolling').value=p.rolling_resistance??0.02;$('surfaceSpeed').value=p.speed_scale??1;$('surfaceAccel').value=p.accel_scale??1;$('surfaceEnergy').value=p.energy_scale??1;const pc=c.perception||{};$('perceptionMode').value=pc.mode||'local';$('sharedMemory').value=String(pc.shared_memory??true);$('broadcastObstacles').value=String(pc.broadcast_obstacles??true);$('broadcastPositions').value=String(pc.broadcast_positions??true);$('obstacleMemory').value=pc.obstacle_memory_s??12;$('commsRange').value=pc.comms_range_m??4;const l=c.limits||{};$('safetyMargin').value=l.safety_margin_m??0.055;$('obstacleMargin').value=l.obstacle_margin_m??0.05;$('robotMargin').value=l.robot_robot_margin_m??0.04;$('reconfigSpeed').value=l.max_reconfig_speed_mps??0.30;$('replanPeriod').value=l.replan_period_steps??3;$('setpointAlpha').value=l.setpoint_smoothing_alpha??0.70;$('setpointRate').value=l.setpoint_max_rate_mps??0.55;$('avoidanceHorizon').value=l.avoidance_horizon_s??1.2;$('smoothReconf').checked=l.smooth_reconfiguration??true;$('enableSafety').checked=l.enable_safety_filter??true;$('allowReverse').checked=l.allow_reverse??true;if($('keepFullTrails'))$('keepFullTrails').checked=l.keep_full_trails??true;$('fullConfigJson').value=JSON.stringify(config,null,2);renderAlgorithmInfo();renderObjectiveInfo();}
+function revObjective(v){return {min_time_all_powered:'min_makespan',min_energy:'min_total_energy'}[v]||v}
+function renderObjectiveInfo(){const o=objectives.find(x=>x.key===$('objectiveFunction').value);$('objectiveInfo').textContent=o?o.description:''}
+$('objectiveFunction').addEventListener('change',()=>{syncConfigFromForms();renderObjectiveInfo()});
+
+async function ensureFormation(render=true){if(config.formation&&config.formation.nodes?.length){return config.formation}return await loadFormationPreset(render)}
+async function makePreset(shape,n,spacing){return await api('/api/formation/preset',{method:'POST',body:JSON.stringify({formation_shape:shape,n_agents:n,formation_spacing:spacing})})}
+async function loadFormationPreset(render=true){syncConfigFromForms();const shape=config.formation_shape==='custom'?'triangle':config.formation_shape;const spec=await makePreset(shape,config.n_agents,config.formation_spacing_m);config.formation=spec;config.agents=null;syncFormsFromConfig();if(render)renderAll();return spec}
+async function alignFormation(){syncConfigFromForms();await ensureFormation(false);const shape=config.formation_shape==='custom'?'triangle':config.formation_shape;config.formation=await api('/api/formation/align',{method:'POST',body:JSON.stringify({formation:config.formation,formation_shape:shape,formation_spacing:config.formation_spacing_m,preserve_ids:true,recompute_matrix:true})});config.formation_shape='custom';syncFormsFromConfig();renderAll()}
+function renderFormationSummary(){const f=config.formation;if(!f){$('formationSummary').textContent='строй ещё не задан';return}const n=f.nodes?.length||0;const tol=f.tolerance_m??0.10;$('formationSummary').innerHTML=`<span class="badge">${escapeHtml(f.name||config.formation_shape)}</span><span class="badge">N=${n}</span><span class="badge">tol=${tol} м</span>`}
+function openFormationModal(){ensureFormation(false).then(()=>{syncFormsFromConfig();$('formationModalShape').value=config.formation_shape==='custom'?'triangle':config.formation_shape;$('formationModalN').value=config.formation.nodes.length;$('formationModalSpacing').value=config.formation_spacing_m||0.38;openModal('formationModal');initFormationCy();renderFormationEditorMatrix()})}
+function initFormationCy(){const els=[];const nodes=config.formation.nodes||[];nodes.forEach(n=>els.push({data:{id:n.id,label:n.name||n.id},position:{x:n.x*S*1.7,y:-n.y*S*1.7}}));const D=config.formation.distance_matrix||[];for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++)if(nodes.length<=10||D[i]?.[j]<=0.7)els.push({data:{id:`fe_${i}_${j}`,source:nodes[i].id,target:nodes[j].id}});if(formationCy)formationCy.destroy();formationCy=cytoscape({container:$('formationCy'),elements:els,layout:{name:'preset'},wheelSensitivity:.18,style:[{selector:'node',style:{'label':'data(label)','background-color':'#4fb3ff','border-width':2,'border-color':'#ff7676','width':20,'height':20,'font-size':10,'color':'#e7f2ff','text-outline-width':2,'text-outline-color':'#07101b'}},{selector:'edge',style:{'line-color':'#6f8298','line-style':'dashed','width':1}}]});formationCy.on('dragfree','node',()=>syncFormationNodesFromCy());formationCy.fit(undefined,30)}
+function syncFormationNodesFromCy(){if(!formationCy)return;(config.formation.nodes||[]).forEach(n=>{const e=formationCy.getElementById(n.id);if(e&&e.length){n.x=round(e.position('x')/(S*1.7),4);n.y=round(-e.position('y')/(S*1.7),4)}});}
+function renderFormationEditorMatrix(){const ids=config.formation.nodes.map(n=>n.id);let D=config.formation.distance_matrix;if(!D){formationRecomputeMatrix(false);D=config.formation.distance_matrix}let h='<table><tr><th></th>'+ids.map(id=>`<th>${id}</th>`).join('')+'</tr>';for(let i=0;i<ids.length;i++){h+=`<tr><th>${ids[i]}</th>`;for(let j=0;j<ids.length;j++)h+=`<td><input class="matrixInput" data-i="${i}" data-j="${j}" value="${Number(D[i][j]).toFixed(3)}"></td>`;h+='</tr>'}$('formationMatrixEditor').innerHTML=h+'</table>'}
+function readFormationMatrixInputs(){const n=config.formation.nodes.length,D=Array.from({length:n},()=>Array(n).fill(0));$('formationMatrixEditor').querySelectorAll('input').forEach(inp=>{D[Number(inp.dataset.i)][Number(inp.dataset.j)]=Number(inp.value)||0});for(let i=0;i<n;i++){D[i][i]=0;for(let j=i+1;j<n;j++){const v=(D[i][j]+D[j][i])/2;D[i][j]=D[j][i]=v}}config.formation.distance_matrix=D}
+function formationRecomputeMatrix(render=true){syncFormationNodesFromCy();const pts=config.formation.nodes,D=[];for(let i=0;i<pts.length;i++){D[i]=[];for(let j=0;j<pts.length;j++)D[i][j]=Math.hypot(pts[i].x-pts[j].x,pts[i].y-pts[j].y)}config.formation.distance_matrix=D;if(render)renderFormationEditorMatrix()}
+async function formationLoadPresetInModal(){const shape=$('formationModalShape').value,n=Math.max(1,Number($('formationModalN').value)||1),spacing=Number($('formationModalSpacing').value)||0.38;config.formation=await makePreset(shape,n,spacing);config.n_agents=n;config.formation_shape=shape;config.formation_spacing_m=spacing;config.agents=null;syncFormsFromConfig();initFormationCy();renderFormationEditorMatrix();renderCanvas()}
+async function formationAddNode(){const n=(config.formation.nodes?.length||0)+1;const shape=$('formationModalShape').value,spacing=Number($('formationModalSpacing').value)||0.38;const preset=await makePreset(shape,n,spacing);const node=deepCopy(preset.nodes[n-1]);config.formation.nodes.push(node);config.n_agents=n;config.formation_shape='custom';formationRecomputeMatrix(false);initFormationCy();renderFormationEditorMatrix();syncFormsFromConfig()}
+async function formationAlignToModalGrid(){const shape=$('formationModalShape').value,n=config.formation.nodes.length,spacing=Number($('formationModalSpacing').value)||0.38;const preset=await makePreset(shape,n,spacing);config.formation.nodes.forEach((node,i)=>{node.x=preset.nodes[i].x;node.y=preset.nodes[i].y});config.formation.distance_matrix=preset.distance_matrix;config.formation.name=`custom_from_${shape}`;config.formation_shape='custom';config.formation_spacing_m=spacing;initFormationCy();renderFormationEditorMatrix();syncFormsFromConfig();renderCanvas()}
+function formationMarkCustom(){config.formation.name='custom';config.formation_shape='custom';syncFormsFromConfig()}
+function formationRemoveSelected(){const sel=formationCy?formationCy.$('node:selected').map(n=>n.id()):[];if(!sel.length)return;config.formation.nodes=config.formation.nodes.filter(n=>!sel.includes(n.id));config.n_agents=config.formation.nodes.length;formationRecomputeMatrix(false);initFormationCy();renderFormationEditorMatrix();syncFormsFromConfig()}
+function formationFit(){if(formationCy)formationCy.fit(undefined,30)}
+async function formationValidateModal(){readFormationMatrixInputs();syncFormationNodesFromCy();const res=await api('/api/formation/validate',{method:'POST',body:JSON.stringify({formation:config.formation,corridor_width:config.corridor_width_m,default_robot_radius:0.09,safety_margin:config.limits.safety_margin_m})});$('formationModalStatus').innerHTML=formatValidation(res)}
+function formationApplyModal(){readFormationMatrixInputs();syncFormationNodesFromCy();config.n_agents=config.formation.nodes.length;config.formation_shape='custom';syncFormsFromConfig();closeModal('formationModal');renderAll()}
+
+async function loadObstacleMap(){syncConfigFromForms();const key=$('obstacleMapPreset').value;const data=await api('/api/obstacle-maps',{method:'POST',body:JSON.stringify({key,mission_length_m:config.mission_length_m,corridor_width_m:config.corridor_width_m})});config.obstacles=data.obstacles||[];invalidateSimulation('карта препятствий загружена');syncFormsFromConfig();renderAll()}
+function loadBenchMapToScene(){$('obstacleMapPreset').value=$('benchMapSelect').value;loadObstacleMap()}
+function applyRandomObstacleSizePreset(){const size=$('randomObsSize')?.value||'medium';const map={small:[0.25,0.45,0.20,0.38,0.42],medium:[0.40,0.75,0.30,0.65,0.55],large:[0.70,1.20,0.50,0.95,0.72]};const v=map[size];if(!v)return;$('randomObsWMin').value=v[0];$('randomObsWMax').value=v[1];$('randomObsHMin').value=v[2];$('randomObsHMax').value=v[3];$('randomObsGap').value=v[4]}
+async function generateRandomObstacles(){syncConfigFromForms();const count=Math.round(num('randomObsCount',6,0,100));let dyn=Number($('randomObsDynamic')?.value);if(!Number.isFinite(dyn))dyn=0;let dynFrac=dyn;if(dynFrac>1){dynFrac=(count>0&&dynFrac<=count)?dynFrac/count:dynFrac/100}dynFrac=Math.max(0,Math.min(1,dynFrac));const size=$('randomObsSize')?.value||'medium';const preset={small:[0.25,0.45,0.20,0.38],medium:[0.40,0.75,0.30,0.65],large:[0.70,1.20,0.50,0.95]}[size];const req={count,seed:Math.round(num('randomObsSeed',42)),dynamic_fraction:dynFrac,kind:$('randomObsKind').value,mission_length_m:config.mission_length_m,corridor_width_m:config.corridor_width_m,size_preset:size,min_gap_m:num('randomObsGap',0.55,0),width_min_m:preset?preset[0]:num('randomObsWMin',0.30,0.01),width_max_m:preset?preset[1]:num('randomObsWMax',0.70,0.01),height_min_m:preset?preset[2]:num('randomObsHMin',0.24,0.01),height_max_m:preset?preset[3]:num('randomObsHMax',0.62,0.01)};try{const data=await api('/api/obstacles/random',{method:'POST',body:JSON.stringify(req)});config.obstacles=data.obstacles||[];invalidateSimulation(`random obstacles: ${config.obstacles.length}`);syncFormsFromConfig();renderAll();$('randomObsStatus').textContent=`Сгенерировано: ${config.obstacles.length}, dynamic_fraction=${round(dynFrac,3)}`}catch(e){alert('Random obstacles: '+e.message);setStatus('random obstacles error')}}
+function clearObstacles(){config.obstacles=[];invalidateSimulation('препятствия очищены');syncFormsFromConfig();renderAll()}
+function obstacleSpecFromInputs(prefix='obs'){let vertices=null;try{const t=$(prefix+'Vertices')?.value;if(t&&t.trim())vertices=JSON.parse(t)}catch(e){}return {id:null,label:$(prefix+'Label')?.value||'obs',kind:$(prefix+'Kind')?.value||'rectangle',x:num(prefix+'X',5),y:num(prefix+'Y',0),width_m:num(prefix+'W',0.55,0.001),height_m:num(prefix+'H',0.45,0.001),radius_m:num(prefix+'R',0.25,0.001),rotation_deg:0,vertices,appear_time_s:num(prefix+'Appear',0,0),disappear_time_s:$(prefix+'Disappear')?.value===''?null:num(prefix+'Disappear',0,0),active_by_default:true,opacity:0.36}}
+function quickAddRectangle(){const idx=(config.obstacles||[]).length+1;const obs={id:`o${String(idx).padStart(2,'0')}`,label:`rect-${idx}`,kind:'rectangle',x:num('quickObsX',5),y:num('quickObsY',0),width_m:num('quickObsW',0.55,0.001),height_m:num('quickObsH',0.45,0.001),radius_m:Math.max(num('quickObsW',0.55),num('quickObsH',0.45))/2,rotation_deg:0,appear_time_s:num('quickObsAppear',0,0),disappear_time_s:$('quickObsDisappear').value===''?null:num('quickObsDisappear',0,0),active_by_default:true,opacity:0.36};config.obstacles=config.obstacles||[];config.obstacles.push(obs);invalidateSimulation('прямоугольник добавлен');syncFormsFromConfig();renderAll()}
+function obstacleArrayFromModal(){try{return JSON.parse($('obstacleModalJson').value||'[]')}catch(e){return config.obstacles||[]}}
+function renderObstacleModalList(){const box=$('obstacleListEditor');if(!box)return;const arr=obstacleArrayFromModal();if(!arr.length){box.innerHTML='<div class="hint">Препятствий нет. Добавьте прямоугольник слева или сгенерируйте random.</div>';return}box.innerHTML='<table><tr><th class="left">id</th><th>kind</th><th>x</th><th>y</th><th>size</th><th>t</th><th></th></tr>'+arr.map((o,i)=>{const size=o.kind==='circle'?`r=${round(o.radius_m||0,2)}`:`${round(o.width_m||0,2)}×${round(o.height_m||0,2)}`;const t=`${round(o.appear_time_s??0,1)}–${o.disappear_time_s==null?'∞':round(o.disappear_time_s,1)}`;return `<tr><td class="left">${escapeHtml(o.id||('o'+i))}</td><td>${escapeHtml(o.kind||'rectangle')}</td><td>${round(o.x||0,2)}</td><td>${round(o.y||0,2)}</td><td>${size}</td><td>${t}</td><td><button onclick="loadObstacleToAddForm(${i})">в форму</button></td></tr>`}).join('')+'</table>'}
+function loadObstacleToAddForm(i){const o=obstacleArrayFromModal()[i];if(!o)return;$('obsKind').value=o.kind||'rectangle';$('obsX').value=o.x??5;$('obsY').value=o.y??0;$('obsW').value=o.width_m??0.55;$('obsH').value=o.height_m??0.45;$('obsR').value=o.radius_m??0.25;$('obsAppear').value=o.appear_time_s??0;$('obsDisappear').value=o.disappear_time_s??'';$('obsLabel').value=o.label||o.id||'rect';$('obsVertices').value=JSON.stringify(o.vertices||[],null,2)}
+function openObstacleModal(){$('obstacleModalJson').value=JSON.stringify(config.obstacles||[],null,2);openModal('obstacleModal');renderObstacleModalList()}
+function obstacleAddFromModal(){const obs=obstacleSpecFromInputs('obs');const idx=(config.obstacles||[]).length+1;obs.id=`o${String(idx).padStart(2,'0')}`;obs.label=obs.label||obs.id;const arr=JSON.parse($('obstacleModalJson').value||'[]');arr.push(obs);$('obstacleModalJson').value=JSON.stringify(arr,null,2);renderObstacleModalList()}
+async function obstacleValidateModal(){try{const arr=JSON.parse($('obstacleModalJson').value||'[]');const res=await api('/api/obstacles/validate',{method:'POST',body:JSON.stringify({obstacles:arr,corridor_width:config.corridor_width_m,mission_length:config.mission_length_m,default_agent_radius_m:0.09,safety_margin_m:config.limits.safety_margin_m})});$('obstacleModalStatus').innerHTML=formatValidation(res)}catch(e){$('obstacleModalStatus').textContent=e.message}}
+function obstacleApplyModal(){try{config.obstacles=JSON.parse($('obstacleModalJson').value||'[]');invalidateSimulation('препятствия применены');syncFormsFromConfig();closeModal('obstacleModal');renderAll()}catch(e){alert(e.message)}}
+function findObstacle(id){return (config.obstacles||[]).find(o=>o.id===id)}
+function openObstacleEditModal(id){const o=findObstacle(id);if(!o)return;$('obsEditId').value=o.id;$('obsEditIdVisible').value=o.id;$('obsEditLabel').value=o.label||o.id;$('obsEditKind').value=o.kind||'rectangle';$('obsEditX').value=round(o.x,3);$('obsEditY').value=round(o.y,3);$('obsEditRotation').value=o.rotation_deg||0;$('obsEditW').value=o.width_m||0.5;$('obsEditH').value=o.height_m||0.35;$('obsEditR').value=o.radius_m||0.25;$('obsEditAppear').value=o.appear_time_s??0;$('obsEditDisappear').value=o.disappear_time_s??'';$('obsEditOpacity').value=o.opacity??0.36;$('obsEditVertices').value=JSON.stringify(o.vertices||[],null,2);openModal('obstacleEditModal')}
+function collectObstacleEdit(){let vertices=null;try{const t=$('obsEditVertices').value;if(t.trim())vertices=JSON.parse(t)}catch(e){}return {id:$('obsEditId').value,label:$('obsEditLabel').value,kind:$('obsEditKind').value,x:num('obsEditX',0),y:num('obsEditY',0),width_m:num('obsEditW',0.5,0.001),height_m:num('obsEditH',0.35,0.001),radius_m:num('obsEditR',0.25,0.001),rotation_deg:num('obsEditRotation',0),vertices,appear_time_s:num('obsEditAppear',0,0),disappear_time_s:$('obsEditDisappear').value===''?null:num('obsEditDisappear',0,0),active_by_default:true,opacity:num('obsEditOpacity',0.36,0.05,1)}}
+function saveObstacleEditModal(){const spec=collectObstacleEdit();const i=(config.obstacles||[]).findIndex(o=>o.id===spec.id);if(i>=0)config.obstacles[i]=spec;if(simId)api(`/api/sim/${simId}/manual`,{method:'POST',body:JSON.stringify({obstacles:[{id:spec.id,spec}],note:'edit obstacle'})}).then(st=>{state=st;config=st.config;syncFormsFromConfig();renderAll()});closeModal('obstacleEditModal');renderAll()}
+function deleteObstacleFromEditModal(){const id=$('obsEditId').value;config.obstacles=(config.obstacles||[]).filter(o=>o.id!==id);if(simId)api(`/api/sim/${simId}/manual`,{method:'POST',body:JSON.stringify({obstacles:[{id,delete:true}],note:'delete obstacle'})}).then(st=>{state=st;config=st.config;syncFormsFromConfig();renderAll()});closeModal('obstacleEditModal');renderAll()}
+
+function renderObstaclesList(){const arr=config.obstacles||[];const el=$('obstaclesList');if(!el)return;if(!arr.length){el.innerHTML='<div class="hint" style="padding:8px">Препятствий нет. Добавьте прямоугольник, карту или random-набор.</div>';return}el.innerHTML='<table><tr><th class="left">id</th><th class="left">тип</th><th>x</th><th>y</th><th>размер</th><th>t, с</th><th></th></tr>'+arr.map((o,i)=>{const oid=o.id||('o'+i);const size=o.kind==='circle'?`r=${round(o.radius_m,2)}`:`${round(o.width_m,2)}×${round(o.height_m,2)}`;const time=`${round(o.appear_time_s||0,1)}→${o.disappear_time_s==null?'∞':round(o.disappear_time_s,1)}`;return `<tr><td class="left">${escapeHtml(oid)}</td><td class="left">${escapeHtml(o.kind||'rectangle')}</td><td>${round(o.x,2)}</td><td>${round(o.y,2)}</td><td>${escapeHtml(size)}</td><td>${escapeHtml(time)}</td><td><button onclick="openObstacleEditModal('${escapeHtml(oid)}')">edit</button></td></tr>`}).join('')+'</table>'}
+function agentSpecs(){if(state?.robots)return state.robots.map(r=>r.spec);if(config.agents)return config.agents;return (config.formation?.nodes||[]).map(n=>({...deepCopy(config.default_agent),id:n.id,name:n.name||n.id,powered:n.powered??true}))}
+function findAgentSpec(id){return agentSpecs().find(a=>a.id===id)}
+function renderAgentsList(){const list=agentSpecs();if(!list.length){$('agentsList').innerHTML='<div class="hint">Сначала задайте формацию.</div>';return}$('agentsList').innerHTML='<table><tr><th class="left">id</th><th class="left">name</th><th>speed</th><th></th></tr>'+list.map(a=>`<tr><td class="left">${escapeHtml(a.id)}</td><td class="left">${escapeHtml(a.name)}</td><td>${round(a.max_speed_mps,2)}</td><td><button onclick="openAgentModal('${a.id}')">edit</button></td></tr>`).join('')+'</table>'}
+function openAgentModal(id){const a=findAgentSpec(id);if(!a)return;$('agentEditId').value=id;$('agentName').value=a.name||id;$('agentPowered').value=String(a.powered??true);$('agentLength').value=a.length_m??0.18;$('agentWidth').value=a.width_m??0.13;$('agentRadius').value=a.radius_m??'';$('agentMass').value=a.mass_kg??0.35;$('agentSpeed').value=a.max_speed_mps??0.38;$('agentAccel').value=a.max_accel_mps2??0.55;$('agentWheel').value=a.wheel_base_m??0.16;$('agentSonic').value=a.sonic_range_m??4;$('agentEnergy').value=a.energy_coeff??1;$('agentColor').value=a.color||'#4fb3ff';openModal('agentModal')}
+function collectAgent(){const id=$('agentEditId').value;return {...deepCopy(config.default_agent),...(findAgentSpec(id)||{}),id,name:$('agentName').value||id,powered:$('agentPowered').value==='true',length_m:num('agentLength',0.18,0.01),width_m:num('agentWidth',0.13,0.01),radius_m:$('agentRadius').value===''?null:num('agentRadius',0.1,0.005),mass_kg:num('agentMass',0.35,0.01),max_speed_mps:num('agentSpeed',0.38,0.01),max_accel_mps2:num('agentAccel',0.55,0.01),wheel_base_m:num('agentWheel',0.16,0.01),sonic_range_m:num('agentSonic',4,0.05),energy_coeff:num('agentEnergy',1,0.01),color:$('agentColor').value||'#4fb3ff'}}
+function saveAgentModal(){const spec=collectAgent();config.agents=config.agents||agentSpecs();const i=config.agents.findIndex(a=>a.id===spec.id);if(i>=0)config.agents[i]=spec;else config.agents.push(spec);if(config.formation){const n=config.formation.nodes.find(n=>n.id===spec.id);if(n){n.name=spec.name;n.powered=spec.powered}}if(simId)api(`/api/sim/${simId}/agent/${spec.id}`,{method:'PUT',body:JSON.stringify({agent:spec})}).then(st=>{state=st;config=st.config;syncFormsFromConfig();renderAll()});closeModal('agentModal');renderAll()}
+
+function algorithmMeta(key){return algorithms.find(a=>a.key===key)||candidates.find(a=>a.key===key)||{key,label:key,description:'',default_params:{},references:[]}}
+function onAlgorithmSelect(){selectedAlgorithmKey=$('algorithm').value;config.algorithm=selectedAlgorithmKey;const m=algorithmMeta(selectedAlgorithmKey);config.algorithm_params=config.algorithm_params||{};if(!config.algorithm_params[selectedAlgorithmKey])config.algorithm_params[selectedAlgorithmKey]=deepCopy(m.default_params||{});renderAlgorithmInfo()}
+function renderAlgorithmInfo(){const m=algorithmMeta($('algorithm')?.value||config.algorithm);if(!$('algorithmInfo'))return;const refs=(m.references||[]).slice(0,2).map(r=>`<a href="${r.url}" target="_blank">${escapeHtml(r.title)}</a>`).join('');$('algorithmInfo').innerHTML=`<span class="badge">${escapeHtml(m.family||'')}</span>${m.standard?'<span class="badge">benchmark</span>':''}<br>${escapeHtml(m.description||'')}${m.limitations?`<br><b>Ограничения:</b> ${escapeHtml(m.limitations)}`:''}<div class="refs">${refs}</div>`}
+function openAlgorithmModal(){selectedAlgorithmKey=$('algorithm').value||config.algorithm;renderAlgorithmCards();loadAlgorithmIntoEditor(selectedAlgorithmKey);openModal('algorithmModal')}
+function renderAlgorithmCards(){const groups={};algorithms.forEach(a=>{const g=a.family||'other';(groups[g]=groups[g]||[]).push(a)});let html='';Object.entries(groups).forEach(([g,items])=>{html+=`<h4>${escapeHtml(g)}</h4>`+items.map(a=>`<div class="card ${a.key===selectedAlgorithmKey?'active':''}" onclick="loadAlgorithmIntoEditor('${a.key}')"><h4>${escapeHtml(a.label||a.key)}</h4><span class="badge">${a.key}</span>${a.standard?'<span class="badge">bench</span>':''}<div class="hint">${escapeHtml(a.description||'')}</div></div>`).join('')});if(candidates.length){html+='<h4>research candidates</h4>'+candidates.map(a=>`<div class="card" onclick="loadAlgorithmIntoEditor('${a.key}')"><h4>${escapeHtml(a.label||a.key)}</h4><span class="badge off">candidate</span><div class="hint">${escapeHtml(a.description||'')}</div></div>`).join('')}$('algorithmCards').innerHTML=html}
+function loadAlgorithmIntoEditor(key){selectedAlgorithmKey=key;const m=algorithmMeta(key);$('algorithmEditorTitle').textContent=m.label||key;$('algorithmEditorDescription').innerHTML=`${escapeHtml(m.description||'')}<br>${m.explainability?escapeHtml(m.explainability):''}${m.limitations?`<br><b>Ограничения:</b> ${escapeHtml(m.limitations)}`:''}<br><b>Соник/карта:</b> ${escapeHtml(m.perception_dependency||'')}<br><b>Команды танка:</b> ${escapeHtml(m.tank_command_model||'')}`;$('algorithmSteps').innerHTML=(m.steps||[]).map(s=>`<li>${escapeHtml(s)}</li>`).join('')||'<li>Нет подробных шагов.</li>';$('algorithmIO').innerHTML=`<b>Входы:</b> ${(m.inputs||[]).map(escapeHtml).join(', ')}<br><b>Выходы:</b> ${(m.outputs||[]).map(escapeHtml).join(', ')}`;$('algorithmEditorKey').value=key;config.algorithm_params=config.algorithm_params||{};if(!config.algorithm_params[key])config.algorithm_params[key]=deepCopy(m.default_params||{});$('algorithmParamsJson').value=JSON.stringify(config.algorithm_params[key]||{},null,2);$('algorithmRefs').innerHTML=(m.references||[]).map(r=>`<a href="${r.url}" target="_blank">${escapeHtml(r.title)}</a>`).join('')||'<div class="hint">Ссылки не заданы.</div>';renderAlgorithmCards()}
+function resetAlgorithmParamsFromMeta(){const m=algorithmMeta(selectedAlgorithmKey);$('algorithmParamsJson').value=JSON.stringify(m.default_params||{},null,2)}
+function applyAlgorithmModal(){const m=algorithmMeta(selectedAlgorithmKey);if(m.implemented===false){alert('Это research candidate, он пока не запускается.');return}try{config.algorithm=selectedAlgorithmKey;$('algorithm').value=selectedAlgorithmKey;config.algorithm_params=config.algorithm_params||{};config.algorithm_params[selectedAlgorithmKey]=JSON.parse($('algorithmParamsJson').value||'{}');renderAlgorithmInfo();closeModal('algorithmModal')}catch(e){alert('Ошибка JSON: '+e.message)}}
+
+function initCanvas(){cy=cytoscape({container:$('cy'),elements:[],layout:{name:'preset'},minZoom:0.06,maxZoom:5,wheelSensitivity:.16,style:[{selector:'node',style:{'label':'data(label)','font-size':10,'color':'#dcecff','text-outline-width':2,'text-outline-color':'#07101b','text-valign':'center','text-halign':'center'}},{selector:'node.hidden',style:{'opacity':0,'width':1,'height':1,'label':''}},{selector:'node.robot',style:{'shape':'round-rectangle','background-color':'data(color)','border-width':3,'border-color':'#ff7676','width':'data(w)','height':'data(h)'}},{selector:'node.robot.upper',style:{'border-color':'#d7ffd6'}},{selector:'node.robot.lower',style:{'border-color':'#efe0ff'}},{selector:'node.robot.blocked',style:{'border-color':'#fff1bb'}},{selector:'node.robot.rejoined',style:{'border-color':'#d8ffe5'}},{selector:'node.target',style:{'shape':'ellipse','background-color':'#fff','width':8,'height':8,'label':'','opacity':.88}},{selector:'node.finalTarget',style:{'shape':'diamond','background-color':'#83f5b3','border-width':1,'border-color':'#d8ffe5','width':11,'height':11,'label':''}},{selector:'node.waypoint',style:{'shape':'ellipse','background-color':'#f0bd55','width':8,'height':8,'label':''}},{selector:'node.startGoal',style:{'shape':'diamond','background-color':'#89e6a3','width':12,'height':12,'border-width':1,'border-color':'#d8ffe5'}},{selector:'node.obstacle',style:{'background-color':'#596273','border-color':'#7b8495','border-width':1,'opacity':'data(opacity)','width':'data(w)','height':'data(h)','shape':'data(shape)'}},{selector:'node.inactiveObstacle',style:{'opacity':.18,'border-style':'dashed'}},{selector:'node.pathpt',style:{'background-color':'#f0bd55','width':4,'height':4,'label':''}},{selector:'node.routept',style:{'background-color':'data(color)','width':4,'height':4,'label':'','opacity':.78}},{selector:'node.trailpt',style:{'background-color':'data(color)','width':3,'height':3,'label':'','opacity':.38}},{selector:'node.measure',style:{'background-color':'#f4c542','width':8,'height':8,'label':'data(label)','color':'#f9e9a0'}},{selector:'node.sonarHit',style:{'shape':'ellipse','background-color':'data(color)','border-width':1,'border-color':'#ffffff','width':7,'height':7,'label':'','opacity':.96}},{selector:'edge',style:{'curve-style':'bezier','line-color':'#5b779a','width':1,'opacity':.65}},{selector:'edge.wall',style:{'line-color':'#22364d','width':2,'opacity':.75}},{selector:'edge.formation',style:{'line-style':'dashed','line-color':'#7d8ea3','width':1.5,'opacity':.65}},{selector:'edge.formation.yellow',style:{'line-color':'#f4c542','width':2.5,'opacity':.95}},{selector:'edge.formation.red',style:{'line-color':'#ff6b6b','width':3.5,'opacity':1}},{selector:'edge.route',style:{'line-color':'data(color)','line-style':'dashed','width':2.2,'opacity':.72,'curve-style':'straight'}},{selector:'edge.agentTrail',style:{'line-color':'data(color)','width':1.2,'opacity':.34,'curve-style':'straight'}},{selector:'edge.history',style:{'line-color':'#d9a742','width':2,'opacity':.75}},{selector:'edge.targetEdge',style:{'line-color':'#fff','line-style':'dotted','width':1,'opacity':.44}},{selector:'edge.measureEdge',style:{'line-color':'#f4c542','width':2,'line-style':'dashed'}},{selector:'edge.sonarRay',style:{'line-color':'data(color)','target-arrow-color':'data(color)','target-arrow-shape':'triangle','width':2,'opacity':.82,'line-style':'dotted','curve-style':'straight','label':'data(label)','font-size':9,'color':'#dcecff','text-background-color':'#07101b','text-background-opacity':.7,'text-background-padding':2}}]});cy.on('dragfree','node.robot, node.obstacle',evt=>{const n=evt.target,p=cy2m(n.position());if(n.hasClass('robot'))dragPatch.robots[n.id()]=p;if(n.hasClass('obstacle'))dragPatch.obstacles[n.id()]=p});cy.on('cxttap','node.robot',evt=>openAgentModal(evt.target.id()));cy.on('tap','node.robot',evt=>{if(!measureMode)selectAgent(evt.target.id())});cy.on('tap','node.obstacle',evt=>openObstacleEditModal(evt.target.id()));cy.on('tap',evt=>{if(evt.target===cy&&measureMode){const p=cy2m(evt.position);measurePoints.push(p);if(measurePoints.length>2)measurePoints=[p];renderMeasureInfo();renderCanvas()}})}
+function routePointsForUi(rt){let pts=rt.smooth_path||rt.path||[];if(($('showFullRoutes')&&$('showFullRoutes').checked)||pts.length<=4)return pts;const wp=rt.control_point||rt.waypoint;let cut=3;if(wp){let best=0,bestD=1e9;pts.forEach((p,i)=>{const d=Math.hypot(p.x-wp.x,p.y-wp.y);if(d<bestD){bestD=d;best=i}});cut=Math.max(2,Math.min(pts.length,best+2))}return pts.slice(0,Math.min(cut,7))}
+function renderCanvas(){
+  if(!cy)return;
+  const els=[];
+  const L=config.mission_length_m||12, half=(config.corridor_width_m||2.4)/2;
+  function addNode(id,label,x,y,cls,data={}){els.push({data:{id,label,...data},position:{x:x*S,y:-y*S},classes:cls})}
+  function addEdge(id,source,target,cls,data={}){els.push({data:{id,source,target,...data},classes:cls})}
+  addNode('start','A',config.start_x_m||0,config.start_y_m||0,'startGoal');
+  addNode('goal','B',(config.start_x_m||0)+L,config.start_y_m||0,'startGoal');
+  addNode('wallU1','',0,half,'hidden'); addNode('wallU2','',L,half,'hidden');
+  addNode('wallL1','',0,-half,'hidden'); addNode('wallL2','',L,-half,'hidden');
+  addEdge('wallU','wallU1','wallU2','wall'); addEdge('wallL','wallL1','wallL2','wall');
+
+  const obstacles=(state?.obstacles||config.obstacles||[]);
+  obstacles.forEach((o,i)=>{
+    if(o.active===false&&!$('showInactiveObs').checked)return;
+    const shape=o.kind==='circle'?'ellipse':(o.kind==='polygon'?'polygon':'round-rectangle');
+    const cls='obstacle '+(o.active===false?'inactiveObstacle':'');
+    const w=(o.kind==='circle'?2*(o.radius_m||0.25):(o.width_m||0.5))*S;
+    const h=(o.kind==='circle'?2*(o.radius_m||0.25):(o.height_m||0.35))*S;
+    let label=o.label||o.id||`o${i}`;
+    if(o.active===false){
+      const ap=(o.appear_time_s!==undefined&&o.appear_time_s!==null)?`@${round(o.appear_time_s,1)}s`:'';
+      label=`${label} ${ap}`.trim();
+    }
+    addNode(o.id||`o${i}`,label,o.x,o.y,cls,{w,h,shape,opacity:o.active===false?0.16:(o.opacity??0.36)});
+  });
+
+  const robots=state?.robots||agentSpecs().map((a,i)=>{const n=config.formation?.nodes?.[i]||{id:a.id,x:0,y:0};return {id:a.id,name:a.name,x:(config.start_x_m||0)+n.x,y:(config.start_y_m||0)+n.y,length_m:a.length_m,width_m:a.width_m,radius_m:a.radius_m||0.1,color:a.color||'#4fb3ff',cluster_id:'center',powered:a.powered,spec:a}});
+
+  if(state&&$('showAgentTrails').checked){
+    Object.entries(state.agent_trails||{}).forEach(([rid,pts])=>{
+      const r=robots.find(x=>x.id===rid), color=r?.color||r?.spec?.color||'#4fb3ff';
+      let prev=null;
+      pts.forEach((p,i)=>{const id=`tr_${rid}_${i}`; addNode(id,'',p.x,p.y,'trailpt',{color}); if(prev)addEdge(`tre_${rid}_${i}`,prev,id,'agentTrail',{color}); prev=id});
+    });
+  }
+  if(state&&state.history){let prev=null;state.history.forEach((p,i)=>{const id=`hist_${i}`;addNode(id,'',p.x,p.y,'pathpt');if(prev)addEdge(`histe_${i}`,prev,id,'history');prev=id})}
+  if(state&&$('showRoutes').checked){
+    (state.planned_routes||[]).forEach((rt,ri)=>{
+      const rr=robots.find(x=>x.id===rt.robot_id)||{};
+      const color=rr.color||clusterColor(rt.cluster_id);
+      let prev=null;
+      routePointsForUi(rt).forEach((p,i)=>{const id=`route_${ri}_${i}`;addNode(id,'',p.x,p.y,'routept',{color});if(prev)addEdge(`routee_${ri}_${i}`,prev,id,'route '+(rt.cluster_id||''),{color});prev=id});
+      if(rt.waypoint)addNode(`wp_${ri}`,'',rt.waypoint.x,rt.waypoint.y,'waypoint');
+    });
+  }
+  if(singleOptimalPath.length){let prev=null;singleOptimalPath.forEach((p,i)=>{const id=`opt_${i}`;addNode(id,'',p.x,p.y,'waypoint');if(prev)addEdge(`opte_${i}`,prev,id,'route',{color:'#e9d06b'});prev=id})}
+  if(replayPath.length){let prev=null;replayPath.forEach((p,i)=>{const id=`rep_${i}`;addNode(id,'',p.x,p.y,'routept',{color:'#ff9ad6'});if(prev)addEdge(`repe_${i}`,prev,id,'route',{color:'#ff9ad6'});prev=id})}
+
+  robots.forEach(r=>{
+    const cls=['robot',r.cluster_id||'center',r.powered?'':'unpowered'].join(' ');
+    const color=r.color||r.spec?.color||'#4fb3ff';
+    addNode(r.id,r.name||r.id,r.x,r.y,cls,{w:Math.max(14,(r.length_m||r.spec?.length_m||0.18)*S),h:Math.max(12,(r.width_m||r.spec?.width_m||0.13)*S),color});
+    if(state&&$('showTargets').checked){
+      const t=r.target, ft=r.final_target;
+      if(t){addNode(`tg_${r.id}`,'',t.x,t.y,'target');addEdge(`te_${r.id}`,r.id,`tg_${r.id}`,'targetEdge')}
+      if(ft)addNode(`ft_${r.id}`,'',ft.x,ft.y,'finalTarget');
+    }
+  });
+
+  if(state&&$('showSonar')?.checked){
+    robots.forEach(r=>{
+      if(!r.sonic_hit || r.sonic_distance_cm===undefined || r.sonic_distance_cm<0)return;
+      const color=r.color||r.spec?.color||'#4fb3ff';
+      const hid=`sonar_${r.id}_hit`;
+      addNode(hid,'',r.sonic_hit.x,r.sonic_hit.y,'sonarHit',{color});
+      const label=`${r.sonic_obstacle_id||''} ${r.sonic_distance_cm}cm`.trim();
+      addEdge(`sonare_${r.id}`,r.id,hid,'sonarRay',{color,label});
+    });
+  }
+
+  if(state?.formation_edges){state.formation_edges.forEach((e,i)=>addEdge(`form_${i}`,e.source,e.target,`formation ${e.severity||''}`))}
+  measurePoints.forEach((p,i)=>addNode(`measure_${i}`,String(i+1),p.x,p.y,'measure'));
+  if(measurePoints.length===2)addEdge('measureEdge','measure_0','measure_1','measureEdge');
+  cy.elements().remove();
+  cy.add(els);
+  cy.layout({name:'preset'}).run();
+  if(autoFitNextRender){cy.fit(undefined,35);autoFitNextRender=false}
+}
+function zoomCanvas(f){cy.zoom({level:cy.zoom()*f,renderedPosition:{x:cy.width()/2,y:cy.height()/2}})}function fitCanvas(){cy.fit(undefined,35)}function centerCanvas(){cy.center()}function resetCanvasZoom(){cy.zoom(1);cy.center()}
+function toggleMeasure(){measureMode=!measureMode;$('measureBtn').classList.toggle('measureOn',measureMode);renderMeasureInfo()}function clearMeasure(){measurePoints=[];renderMeasureInfo();renderCanvas()}function renderMeasureInfo(){if(measurePoints.length===2){const a=measurePoints[0],b=measurePoints[1],d=Math.hypot(a.x-b.x,a.y-b.y);$('measureInfo').innerHTML=`Расстояние: <b>${round(d,3)} м</b>; A=(${round(a.x,2)}, ${round(a.y,2)}), B=(${round(b.x,2)}, ${round(b.y,2)})`}else $('measureInfo').textContent=measureMode?'Кликните две точки на поле.':'Кнопка измерения: затем кликните две точки на поле.'}
+
+async function createMission(){try{syncConfigFromForms();await ensureFormation(false);setStatus('создаю миссию...');autoFitNextRender=true;state=await api('/api/sim',{method:'POST',body:JSON.stringify(config)});simId=state.id;config=state.config;syncFormsFromConfig();setStatus(`sim=${simId}, step=${state.step}`);renderAll()}catch(e){alert('Ошибка создания миссии: '+e.message);setStatus('ошибка')}}
+async function stepSim(n){if(!simId)await createMission();try{state=await api(`/api/sim/${simId}/step`,{method:'POST',body:JSON.stringify({steps:n,algorithm:$('algorithm').value,algorithm_params:config.algorithm_params||{}})});config=state.config;syncFormsFromConfig();setStatus(`sim=${simId}, step=${state.step}, ${state.finish_reason}`);renderAll();if(state.done&&autoTimer)toggleAuto(false)}catch(e){alert('Step error: '+e.message)}}
+function toggleAuto(force){if(force===false||autoTimer){clearInterval(autoTimer);autoTimer=null;$('autoBtn').textContent='Авто';return}$('autoBtn').textContent='Стоп';autoTimer=setInterval(()=>stepSim(Math.max(1,Number($('autoSteps').value)||1)),160)}
+async function stepUntilDone(){if(!simId)await createMission();for(let i=0;i<500;i++){if(state?.done)break;await stepSim(10);await new Promise(r=>setTimeout(r,0))}}
+async function applyDragged(){if(!simId){alert('Сначала создайте миссию.');return}const robots=Object.entries(dragPatch.robots).map(([id,p])=>({id,x:p.x,y:p.y}));const obstacles=Object.entries(dragPatch.obstacles).map(([id,p])=>({id,x:p.x,y:p.y}));dragPatch={robots:{},obstacles:{}};if(!robots.length&&!obstacles.length)return;state=await api(`/api/sim/${simId}/manual`,{method:'POST',body:JSON.stringify({robots,obstacles,note:'drag from UI'})});config=state.config;syncFormsFromConfig();renderAll()}
+
+function renderLogsInfo(){
+  const box=$('logsInfo');
+  if(!box)return;
+  if(!simId||!state){box.innerHTML='Миссия не создана: после запуска здесь будут ссылки и счётчики накопленных логов.';return;}
+  const logs=state.logs||{};
+  box.innerHTML=`Логи доступны для скачивания: CSV rows=${logs.csv_rows??0}, g-lines=${logs.g_lines??0}. Алгоритм: <b>${escapeHtml(state.algorithm||config.algorithm)}</b>, step=${state.step}, t=${round(state.time_s||0,2)} c. Нажмите ZIP, чтобы скачать CSV + g.log + tank_commands + config одним архивом.`;
+}
+function renderAll(){renderCanvas();renderFormationSummary();renderObstaclesList();renderAgentsList();renderClusterProcessInfo();renderInitialSummary();renderMetrics();renderMatrices();renderAgentMetrics();renderSelectedAgentFromState();renderDecision();renderLogsInfo();$('fullConfigJson').value=JSON.stringify(config,null,2);$('analysisText').innerHTML='CSV содержит primary_* измеряемые поля, control_* команды, agent_* индивидуальные метрики и group_* сводные метрики. Для физического сравнения используйте g.log, tank_commands.csv или полный ZIP из вкладки Логи.';}
+function renderClusterProcessInfo(){
+  const box=$('clusterProcessInfo');
+  if(!box)return;
+  const cp=state?.cluster_plan;
+  if(!cp){box.textContent='Процесс обтекания: после запуска здесь будут phase/mode, blockers, clusters и setpoint/следы.';return;}
+  const blockers=(cp.blockers||[]).map(x=>String(x)).join(', ')||'нет';
+  const clusters=(cp.clusters||[]).map(c=>`${escapeHtml(c.id||c.name||'cluster')}:${(c.members||[]).length||c.size||0}${c.target_y!==undefined?'@y='+round(c.target_y,2):''}`).join(' · ')||'—';
+  const routes=cp.route_count??((state?.planned_routes||[]).length);
+  box.innerHTML=`phase: <b>${escapeHtml(cp.mode||'unknown')}</b>; blockers: ${escapeHtml(blockers)}; clusters: ${clusters}; routes: ${routes}`;
+}
+function summarySource(){return state?.initial_summary||{mission_name:config.name,mission_length_m:config.mission_length_m,corridor_width_m:config.corridor_width_m,start:{x:config.start_x_m||0,y:config.start_y_m||0},algorithm:config.algorithm,objective_function:config.objective?.objective_function,completion_policy:config.objective?.completion_policy,perception_mode:config.perception?.mode,shared_memory:config.perception?.shared_memory,surface:config.scene_physics,formation:{name:config.formation?.name||config.formation_shape,n:config.formation?.nodes?.length||config.n_agents,tolerance_m:config.formation?.tolerance_m},agents:agentSpecs().map(a=>({id:a.id,name:a.name,length_m:a.length_m,width_m:a.width_m,color:a.color,max_speed_mps:a.max_speed_mps,sonic_range_m:a.sonic_range_m})),obstacle_count:(config.obstacles||[]).length,obstacles:config.obstacles||[]}}
+function tableFromObject(obj,keys=null){let html='<table>';(keys||Object.keys(obj||{})).forEach(k=>{const v=obj?.[k];html+=`<tr><th class="left">${escapeHtml(k)}</th><td>${escapeHtml(typeof v==='object'?JSON.stringify(v):v)}</td></tr>`});return html+'</table>'}
+function renderInitialSummary(){const s=summarySource();let html='<h3>Начальные условия эксперимента</h3>'+tableFromObject(s,['mission_name','mission_length_m','corridor_width_m','start','algorithm','objective_function','completion_policy','perception_mode','shared_memory','surface','formation','obstacle_count']);html+='<h3>Агенты</h3><div class="scrollbox"><table><tr><th class="left">id</th><th class="left">name</th><th>size</th><th>color</th><th>sonic</th></tr>'+(s.agents||[]).map(a=>`<tr><td class="left">${escapeHtml(a.id)}</td><td class="left">${escapeHtml(a.name)}</td><td>${round(a.length_m,3)}×${round(a.width_m,3)}</td><td>${escapeHtml(a.color)}</td><td>${round(a.sonic_range_m,2)}</td></tr>`).join('')+'</table></div>';html+='<h3>Препятствия</h3><pre class="scrollbox small">'+escapeHtml(JSON.stringify((s.obstacles||[]).slice(0,30),null,2))+'</pre>';if($('initialBox'))$('initialBox').innerHTML=html;}
+function renderMetrics(){const m=state?.metrics;if(!m){$('metricsBox').innerHTML='<div class="hint">Миссия ещё не создана. Нажмите Apply, чтобы увидеть применённые НУ, затем Создать / пересоздать.</div>';return}let html='<h3>Summary симуляции</h3>'+tableFromObject(m);$('metricsBox').innerHTML=html}
+function matrixHtml(M,ids,desired){if(!M)return'';let h='<table><tr><th></th>'+ids.map(id=>`<th>${id}</th>`).join('')+'</tr>';for(let i=0;i<ids.length;i++){h+=`<tr><th>${ids[i]}</th>`;for(let j=0;j<ids.length;j++){let cls='';if(desired&&i!==j){const d=Math.abs(M[i][j]-desired[i][j]);if(d>.17)cls='cellBad';else if(d>.09)cls='cellWarn'}h+=`<td class="${cls}">${Number(M[i][j]).toFixed(2)}</td>`}h+='</tr>'}return h+'</table>'}
+function renderMatrices(){const mat=state?.matrices;if(!mat){$('matrixBox').innerHTML='<div class="hint">После создания миссии здесь будут D0, D(t), ΔD.</div>';return}const ids=mat.ids||[];$('matrixBox').innerHTML=`<h3>D0 заданная</h3><div class="scrollbox">${matrixHtml(mat.initial,ids)}</div><h3>D(t) текущая</h3><div class="scrollbox">${matrixHtml(mat.current,ids,mat.initial)}</div><h3>ΔD</h3><div class="scrollbox">${matrixHtml(mat.delta,ids)}</div><h3>Проблемные пары</h3><pre class="scrollbox small">${escapeHtml(JSON.stringify(mat.bad_pairs||[],null,2))}</pre>`}
+function renderAgentMetrics(){const rows=state?.agent_metrics;if(!rows){$('agentMetricsBox').innerHTML='<div class="hint">Нет данных.</div>';return}let h='<table><tr><th class="left">id</th><th>path</th><th>energy</th><th>goal</th><th>coll</th><th>near</th></tr>';rows.forEach(r=>h+=`<tr><td class="left">${escapeHtml(r.id)}</td><td>${r.path_length_m}</td><td>${r.energy_proxy}</td><td>${r.goal_distance_m}</td><td>${r.collision_events}</td><td>${r.near_miss_events}</td></tr>`);$('agentMetricsBox').innerHTML=h+'</table>'}
+function renderDecision(){
+  const robots=(state?.robots||[]).map(r=>({
+    id:r.id,name:r.name,algorithm:state?.algorithm||config.algorithm,
+    cmd_v:r.v,cmd_omega:r.omega,pwr_left:r.pwr_left,pwr_right:r.pwr_right,
+    tank_command:r.tank_command,reason:r.last_reason,
+    sonar:{angle_deg:r.sonic_angle_deg,distance_cm:r.sonic_distance_cm,obstacle_id:r.sonic_obstacle_id,hit:r.sonic_hit,visible_count:r.sonic_visible_count,observations:r.sonic_observations||[]},
+    cluster_id:r.cluster_id,target:r.target,final_target:r.final_target
+  }));
+  $('decisionBox').textContent=JSON.stringify({
+    algorithm:state?.algorithm||config.algorithm,
+    objective:config.objective,
+    perception:config.perception,
+    sonar_dependency:'global_debug: алгоритм получает все активные препятствия; local: только препятствия, которые попали в дальность и передний сектор соника, плюс shared_memory если включена.',
+    last_robot_commands:robots,
+    cluster_plan:state?.cluster_plan,
+    planned_routes:(state?.planned_routes||[]).slice(0,8)
+  },null,2)
+}
+function formatValidation(res){return `${res.ok?'<span class="ok">OK</span>':'<span class="badText">ERROR</span>'}<br>errors: ${(res.errors||[]).map(escapeHtml).join('; ')||'—'}<br>warnings: ${(res.warnings||[]).map(escapeHtml).join('; ')||'—'}`}
+
+function sonarHtml(r){
+  const obs=r.sonic_observations||[];
+  return '<h3>Соник агента</h3>'+tableFromObject({
+    obstacle_id:r.sonic_obstacle_id||'—',
+    angle_deg:r.sonic_angle_deg,
+    distance_cm:r.sonic_distance_cm,
+    visible_count:r.sonic_visible_count,
+    hit:r.sonic_hit||'—'
+  })+'<h3>Все видимые sonar-объекты</h3><pre class="scrollbox small">'+escapeHtml(JSON.stringify(obs,null,2))+'</pre>';
+}
+function renderSelectedAgentFromState(){
+  if(!selectedAgentId)return;
+  const r=(state?.robots||[]).find(x=>x.id===selectedAgentId);
+  if(!r)return;
+  const html='<h3>Онлайн-статус агента '+escapeHtml(r.name||r.id)+'</h3>'+tableFromObject({
+    id:r.id,name:r.name,step:state?.step,time_s:round(state?.time_s||0,3),algorithm:state?.algorithm,perception_mode:state?.metrics?.perception_mode,
+    x:round(r.x,3),y:round(r.y,3),theta:round(r.theta,3),v:round(r.v,3),omega:round(r.omega,3),
+    pwr_left:r.pwr_left,pwr_right:r.pwr_right,cluster_id:r.cluster_id,role:r.role,last_reason:r.last_reason,tank_command:r.tank_command
+  })+sonarHtml(r);
+  if($('onlineAgentBox'))$('onlineAgentBox').innerHTML=html;
+}
+async function selectAgent(id){
+  selectedAgentId=id;
+  activateRightTab('onlineTab');
+  renderSelectedAgentFromState();
+  if(simId){
+    try{
+      const st=await api(`/api/sim/${simId}/agent/${id}/status`);
+      const a=st.agent||{};
+      const view={
+        id:a.id,name:a.name,step:st.step,time_s:round(st.time_s||0,3),algorithm:st.algorithm,perception_mode:st.perception_mode,
+        x:round(a.x,3),y:round(a.y,3),theta:round(a.theta,3),v:round(a.v,3),omega:round(a.omega,3),
+        pwr_left:a.pwr_left,pwr_right:a.pwr_right,cluster_id:a.cluster_id,role:a.role,last_reason:a.last_reason,
+        sonic_distance_cm:a.sonic_distance_cm,sonic_angle_deg:a.sonic_angle_deg,sonic_obstacle_id:a.sonic_obstacle_id||'—',sonic_visible_count:a.sonic_visible_count,
+        tank_command:a.tank_command
+      };
+      $('onlineAgentBox').innerHTML='<h3>Онлайн-статус агента '+escapeHtml(a.name||id)+'</h3>'+tableFromObject(view)+sonarHtml(a)+'<h3>Локально видимые препятствия сейчас</h3><pre class="scrollbox small">'+escapeHtml(JSON.stringify(st.visible_obstacles||[],null,2))+'</pre><h3>Agent metrics</h3><pre class="scrollbox small">'+escapeHtml(JSON.stringify(st.metrics||{},null,2))+'</pre>';
+    }catch(e){$('onlineAgentBox').textContent=e.message}
+  }
+}
+async function refreshGLog(){if(!simId)return;const res=await api(`/api/sim/${simId}/log/g`);$('gLog').textContent=(res.lines||[]).join('\n');renderLogsInfo()}
+async function downloadEndpoint(url,filename){const res=await fetch(url);if(!res.ok){alert(await res.text());return}const blob=await res.blob();const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;a.click();URL.revokeObjectURL(a.href)}
+function downloadCsv(){if(!simId){alert('Сначала создайте миссию.');return}downloadEndpoint(`/api/sim/${simId}/log.csv`,`mission_${simId}.csv`)}
+function downloadGLog(){if(!simId){alert('Сначала создайте миссию.');return}downloadEndpoint(`/api/sim/${simId}/log/g.txt`,`mission_${simId}_g.log`)}
+function downloadTankCommands(){if(!simId){alert('Сначала создайте миссию.');return}downloadEndpoint(`/api/sim/${simId}/log/tank_commands.csv`,`mission_${simId}_tank_commands.csv`)}
+function downloadLogsZip(){if(!simId){alert('Сначала создайте миссию.');return}downloadEndpoint(`/api/sim/${simId}/logs.zip`,`mission_${simId}_logs.zip`)}
+function downloadCurrentConfig(){syncConfigFromForms();const blob=new Blob([JSON.stringify(config,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mission_config_v6_3.json';a.click();URL.revokeObjectURL(a.href)}
+function importConfigFile(evt){const f=evt.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{config=JSON.parse(r.result);state=null;simId=null;syncFormsFromConfig();renderAll()}catch(e){alert(e.message)}};r.readAsText(f)}
+async function loadSelectedExample(){const e=examples[Number($('exampleSelect').value||0)];if(!e)return;const fname=e.config||e.name;const data=await fetch('/examples/'+fname).then(r=>r.json());config=data;state=null;simId=null;syncFormsFromConfig();renderAll();setStatus('пример загружен: '+fname)}
+function applyFullConfigJson(){try{config=JSON.parse($('fullConfigJson').value);state=null;simId=null;syncFormsFromConfig();renderAll()}catch(e){alert(e.message)}}
+
+function makeSingleAgentMission(){config.n_agents=1;config.formation_shape='line';config.agents=null;loadFormationPreset(true)}
+async function computeSingleOptimal(){syncConfigFromForms();const req={mission_length_m:config.mission_length_m,corridor_width_m:config.corridor_width_m,start:{x:config.start_x_m||0,y:config.start_y_m||0},goal:{x:(config.start_x_m||0)+config.mission_length_m,y:config.start_y_m||0},agent:config.default_agent,obstacles:config.obstacles||[],safety_margin_m:config.limits.safety_margin_m,resolution_m:0.04};const res=await api('/api/single/optimal',{method:'POST',body:JSON.stringify(req)});singleOptimalPath=res.path||[];$('singleResult').textContent=JSON.stringify(res,null,2);renderCanvas()}
+async function replayPhysicalLog(){syncConfigFromForms();const mission={mission_length_m:config.mission_length_m,corridor_width_m:config.corridor_width_m,start:{x:config.start_x_m||0,y:config.start_y_m||0},goal:{x:(config.start_x_m||0)+config.mission_length_m,y:config.start_y_m||0},agent:config.default_agent,obstacles:config.obstacles||[],safety_margin_m:config.limits.safety_margin_m,resolution_m:0.04};const res=await api('/api/single/replay-log',{method:'POST',body:JSON.stringify({mission,log_text:$('physicalLogInput').value,csv_text:'',dt_s:config.dt_s})});replayPath=res.replayed_path||[];singleOptimalPath=res.optimal?.path||[];$('physicalReplayOutput').textContent=JSON.stringify(res,null,2);renderCanvas()}
+async function runBenchmark(){if(!simId)await createMission();const chosen=[...document.querySelectorAll('.benchAlg:checked')].map(x=>x.value);const seeds=$('benchSeeds').value.split(',').map(s=>Number(s.trim())).filter(Number.isFinite);const res=await api(`/api/sim/${simId}/benchmark`,{method:'POST',body:JSON.stringify({algorithms:chosen.length?chosen:algorithms.filter(a=>a.standard).map(a=>a.key),seeds:seeds.length?seeds:[1],max_steps:Math.round(num('benchMaxSteps',config.max_steps||900,1))})});$('benchmarkOutput').textContent=JSON.stringify(res,null,2)}
+
+window.addEventListener('load',init);
+</script>
+</body>
+</html>

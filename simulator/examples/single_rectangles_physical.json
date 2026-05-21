@@ -1,0 +1,121 @@
+{
+  "name": "single_rectangles_physical",
+  "mission_length_m": 12.0,
+  "corridor_width_m": 2.2,
+  "dt_s": 0.2,
+  "max_steps": 950,
+  "algorithm": "completion_astar",
+  "grid_resolution_m": 0.12,
+  "seed": 42,
+  "formation": {
+    "name": "line_1",
+    "nodes": [
+      {
+        "id": "r01",
+        "name": "r01",
+        "x": 0.0,
+        "y": 0.0,
+        "powered": true
+      }
+    ],
+    "distance_matrix": [
+      [
+        0.0
+      ]
+    ],
+    "tolerance_m": 0.095,
+    "edge_tolerance_m": 0.08360000000000001,
+    "locked_edges": [],
+    "assignment_mode": "identity"
+  },
+  "n_agents": 1,
+  "formation_shape": "line",
+  "formation_spacing_m": 0.38,
+  "random_obstacles": false,
+  "random_obstacle_count": 0,
+  "perception": {
+    "mode": "global_debug",
+    "shared_memory": true,
+    "obstacle_memory_s": 18.0,
+    "comms_range_m": 4.0,
+    "broadcast_obstacles": true,
+    "broadcast_positions": true
+  },
+  "objective": {
+    "completion_policy": "finish_first",
+    "collective_goal_weight": 1.0,
+    "agent_survival_weight": 1.0,
+    "final_place_weight": 1.0,
+    "energy_weight": 0.2,
+    "time_weight": 0.25,
+    "centroid_length_weight": 0.25,
+    "allow_reassignment": false,
+    "require_all_powered_agents": true,
+    "success_requires_formation": true,
+    "success_requires_no_collision": false
+  },
+  "limits": {
+    "safety_margin_m": 0.055,
+    "robot_robot_margin_m": 0.04,
+    "obstacle_margin_m": 0.05,
+    "replan_period_steps": 4,
+    "max_reconfig_speed_mps": 0.3,
+    "avoidance_horizon_s": 1.2,
+    "enable_safety_filter": true,
+    "allow_reverse": true,
+    "stop_if_no_path": false
+  },
+  "obstacles": [
+    {
+      "id": "rA",
+      "label": "center-rect",
+      "kind": "rectangle",
+      "x": 3.2,
+      "y": 0.0,
+      "width_m": 0.55,
+      "height_m": 0.55,
+      "radius_m": 0.25,
+      "rotation_deg": 0.0,
+      "appear_time_s": 0.0,
+      "disappear_time_s": null,
+      "vx_mps": 0.0,
+      "vy_mps": 0.0,
+      "active_by_default": true,
+      "opacity": 0.35
+    },
+    {
+      "id": "rB",
+      "label": "upper-rect",
+      "kind": "rectangle",
+      "x": 5.7,
+      "y": 0.45,
+      "width_m": 0.7,
+      "height_m": 0.45,
+      "radius_m": 0.25,
+      "rotation_deg": 0.0,
+      "appear_time_s": 0.0,
+      "disappear_time_s": null,
+      "vx_mps": 0.0,
+      "vy_mps": 0.0,
+      "active_by_default": true,
+      "opacity": 0.35
+    },
+    {
+      "id": "rC",
+      "label": "lower-rect",
+      "kind": "rectangle",
+      "x": 8.1,
+      "y": -0.42,
+      "width_m": 0.65,
+      "height_m": 0.45,
+      "radius_m": 0.25,
+      "rotation_deg": 0.0,
+      "appear_time_s": 0.0,
+      "disappear_time_s": null,
+      "vx_mps": 0.0,
+      "vy_mps": 0.0,
+      "active_by_default": true,
+      "opacity": 0.35
+    }
+  ]
+}

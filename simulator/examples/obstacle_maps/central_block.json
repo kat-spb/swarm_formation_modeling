@@ -1,0 +1,30 @@
+{
+  "key": "central_block",
+  "title": "Центральный блок",
+  "description": "Один прямоугольник на оси полосы: тест выбора верх/низ.",
+  "bench_focus": "side_choice",
+  "mission_length_m": 12.0,
+  "corridor_width_m": 2.4,
+  "obstacles": [
+    {
+      "id": "central-block",
+      "label": "central-block",
+      "kind": "rectangle",
+      "x": 5.76,
+      "y": 0.0,
+      "width_m": 0.7,
+      "height_m": 0.62,
+      "rotation_deg": 0.0,
+      "radius_m": 0.35,
+      "vertices": null,
+      "side_lengths_m": null,
+      "interior_angles_deg": null,
+      "appear_time_s": 0.0,
+      "disappear_time_s": null,
+      "vx_mps": 0.0,
+      "vy_mps": 0.0,
+      "active_by_default": true,
+      "opacity": 0.36
+    }
+  ]
+}

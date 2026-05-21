@@ -1,0 +1,180 @@
+{
+  "examples": [
+    {
+      "title": "Физический танк: 404 см, чистая полоса, PWM 10000 ковролин",
+      "config": "physical_tank_404cm_clear_pwm10000_carpet.json",
+      "csv": "control_physical_tank_404cm_clear_pwm10000_carpet.csv",
+      "glog": "control_physical_tank_404cm_clear_pwm10000_carpet.g.log",
+      "tank_commands": "control_physical_tank_404cm_clear_pwm10000_carpet_tank_commands.csv",
+      "expected": {
+        "finish_reason": "success",
+        "physical_distance_m": 4.04,
+        "surface": "carpet",
+        "pwm": 10000,
+        "steps": 27
+      }
+    },
+    {
+      "title": "Физический танк: коробка 21×10 см, N=1, local sonar",
+      "config": "physical_tank_box_404cm_local_sonar.json",
+      "csv": "control_physical_tank_box_404cm_local_sonar.csv",
+      "glog": "control_physical_tank_box_404cm_local_sonar.g.log",
+      "tank_commands": "control_physical_tank_box_404cm_local_sonar_tank_commands.csv",
+      "expected": {
+        "finish_reason": "success",
+        "box_size_m": "0.21×0.10",
+        "physical_distance_m": 4.04,
+        "steps": 32
+      }
+    },
+    {
+      "title": "7 агентов, плавное обтекание split/rejoin v6",
+      "config": "formation_7_smooth_bypass.json",
+      "csv": "control_formation_7_smooth_bypass.csv",
+      "glog": "control_formation_7_smooth_bypass.g.log",
+      "expected": {
+        "finish_reason": "success",
+        "steps": 206
+      },
+      "tank_commands": "control_formation_7_smooth_bypass_tank_commands.csv"
+    },
+    {
+      "title": "1 машинка, чистая полоса 12 м",
+      "config": "single_clear_12m.json",
+      "csv": "control_single_clear_12m.csv",
+      "glog": "control_single_clear_12m.g.log",
+      "expected": {
+        "finish_reason": "success",
+        "steps": 188
+      },
+      "tank_commands": "control_single_clear_12m_tank_commands.csv"
+    },
+    {
+      "title": "1 машинка, прямоугольники, оптимальный маршрут",
+      "config": "single_rectangles_physical.json",
+      "csv": "control_single_rectangles_physical.csv",
+      "glog": "control_single_rectangles_physical.g.log",
+      "optimal_path": "optimal_single_rectangles_path.json",
+      "optimal_control_csv": "optimal_single_rectangles_control.csv",
+      "expected": {
+        "finish_reason": "success",
+        "steps": 186,
+        "optimal_length_m": 12.060362963442648
+      },
+      "tank_commands": "control_single_rectangles_physical_tank_commands.csv"
+    },
+    {
+      "title": "7 агентов, adaptive split/rejoin вокруг прямоугольников",
+      "config": "formation_7_adaptive_split.json",
+      "csv": "control_formation_7_adaptive_split.csv",
+      "glog": "control_formation_7_adaptive_split.g.log",
+      "expected": {
+        "finish_reason": "success",
+        "steps": 203
+      },
+      "tank_commands": "control_formation_7_adaptive_split_tank_commands.csv"
+    },
+    {
+      "title": "6 агентов, препятствие появляется и исчезает",
+      "config": "formation_6_dynamic_popup.json",
+      "csv": "control_formation_6_dynamic_popup.csv",
+      "glog": "control_formation_6_dynamic_popup.g.log",
+      "expected": {
+        "finish_reason": "success",
+        "steps": 191
+      },
+      "tank_commands": "control_formation_6_dynamic_popup_tank_commands.csv"
+    },
+    {
+      "title": "4 агента, проход через ворота и сборка строя",
+      "config": "formation_4_gate_rejoin.json",
+      "csv": "control_formation_4_gate_rejoin.csv",
+      "glog": "control_formation_4_gate_rejoin.g.log",
+      "expected": {
+        "finish_reason": "success",
+        "steps": 245
+      },
+      "tank_commands": "control_formation_4_gate_rejoin_tank_commands.csv"
+    },
+    {
+      "title": "Benchmark map: clear_lane",
+      "config": "benchmark_map_clear_lane.json",
+      "map_key": "clear_lane",
+      "expected": {
+        "purpose": "predefined benchmark map"
+      }
+    },
+    {
+      "title": "Benchmark map: single_gate",
+      "config": "benchmark_map_single_gate.json",
+      "map_key": "single_gate",
+      "expected": {
+        "purpose": "predefined benchmark map"
+      }
+    },
+    {
+      "title": "Benchmark map: two_gates",
+      "config": "benchmark_map_two_gates.json",
+      "map_key": "two_gates",
+      "expected": {
+        "purpose": "predefined benchmark map"
+      }
+    },
+    {
+      "title": "Benchmark map: rect_gate",
+      "config": "benchmark_map_rect_gate.json",
+      "map_key": "rect_gate",
+      "expected": {
+        "purpose": "predefined benchmark map"
+      }
+    },
+    {
+      "title": "Benchmark map: central_block",
+      "config": "benchmark_map_central_block.json",
+      "map_key": "central_block",
+      "expected": {
+        "purpose": "predefined benchmark map"
+      }
+    },
+    {
+      "title": "Benchmark map: zigzag_rects",
+      "config": "benchmark_map_zigzag_rects.json",
+      "map_key": "zigzag_rects",
+      "expected": {
+        "purpose": "predefined benchmark map"
+      }
+    },
+    {
+      "title": "Benchmark map: split_rejoin",
+      "config": "benchmark_map_split_rejoin.json",
+      "map_key": "split_rejoin",
+      "expected": {
+        "purpose": "predefined benchmark map"
+      }
+    },
+    {
+      "title": "Benchmark map: narrow_slalom",
+      "config": "benchmark_map_narrow_slalom.json",
+      "map_key": "narrow_slalom",
+      "expected": {
+        "purpose": "predefined benchmark map"
+      }
+    },
+    {
+      "title": "Benchmark map: dynamic_popup",
+      "config": "benchmark_map_dynamic_popup.json",
+      "map_key": "dynamic_popup",
+      "expected": {
+        "purpose": "predefined benchmark map"
+      }
+    },
+    {
+      "title": "Benchmark map: mixed_circles_rects",
+      "config": "benchmark_map_mixed_circles_rects.json",
+      "map_key": "mixed_circles_rects",
+      "expected": {
+        "purpose": "predefined benchmark map"
+      }
+    }
+  ]
+}

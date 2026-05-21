@@ -1,0 +1,163 @@
+{
+  "name": "formation_4_gate_rejoin",
+  "mission_length_m": 12.0,
+  "corridor_width_m": 2.1,
+  "dt_s": 0.2,
+  "max_steps": 950,
+  "algorithm": "completion_astar",
+  "grid_resolution_m": 0.12,
+  "seed": 42,
+  "formation": {
+    "name": "square_4",
+    "nodes": [
+      {
+        "id": "r01",
+        "name": "r01",
+        "x": -0.21,
+        "y": -0.21,
+        "powered": true
+      },
+      {
+        "id": "r02",
+        "name": "r02",
+        "x": 0.21,
+        "y": -0.21,
+        "powered": true
+      },
+      {
+        "id": "r03",
+        "name": "r03",
+        "x": -0.21,
+        "y": 0.21,
+        "powered": true
+      },
+      {
+        "id": "r04",
+        "name": "r04",
+        "x": 0.21,
+        "y": 0.21,
+        "powered": true
+      }
+    ],
+    "distance_matrix": [
+      [
+        0.0,
+        0.42,
+        0.42,
+        0.5939696961966999
+      ],
+      [
+        0.42,
+        0.0,
+        0.5939696961966999,
+        0.42
+      ],
+      [
+        0.42,
+        0.5939696961966999,
+        0.0,
+        0.42
+      ],
+      [
+        0.5939696961966999,
+        0.42,
+        0.42,
+        0.0
+      ]
+    ],
+    "tolerance_m": 0.105,
+    "edge_tolerance_m": 0.0924,
+    "locked_edges": [],
+    "assignment_mode": "identity"
+  },
+  "n_agents": 4,
+  "formation_shape": "square",
+  "formation_spacing_m": 0.42,
+  "random_obstacles": false,
+  "random_obstacle_count": 0,
+  "perception": {
+    "mode": "local",
+    "shared_memory": true,
+    "obstacle_memory_s": 18.0,
+    "comms_range_m": 4.0,
+    "broadcast_obstacles": true,
+    "broadcast_positions": true
+  },
+  "objective": {
+    "completion_policy": "finish_first",
+    "collective_goal_weight": 1.0,
+    "agent_survival_weight": 1.0,
+    "final_place_weight": 1.0,
+    "energy_weight": 0.2,
+    "time_weight": 0.25,
+    "centroid_length_weight": 0.25,
+    "allow_reassignment": false,
+    "require_all_powered_agents": true,
+    "success_requires_formation": true,
+    "success_requires_no_collision": false
+  },
+  "limits": {
+    "safety_margin_m": 0.055,
+    "robot_robot_margin_m": 0.04,
+    "obstacle_margin_m": 0.05,
+    "replan_period_steps": 4,
+    "max_reconfig_speed_mps": 0.3,
+    "avoidance_horizon_s": 1.2,
+    "enable_safety_filter": true,
+    "allow_reverse": true,
+    "stop_if_no_path": false
+  },
+  "obstacles": [
+    {
+      "id": "gate-left",
+      "label": "gate-left",
+      "kind": "rectangle",
+      "x": 5.2,
+      "y": -0.58,
+      "width_m": 0.85,
+      "height_m": 0.5,
+      "radius_m": 0.25,
+      "rotation_deg": 0.0,
+      "appear_time_s": 0.0,
+      "disappear_time_s": null,
+      "vx_mps": 0.0,
+      "vy_mps": 0.0,
+      "active_by_default": true,
+      "opacity": 0.35
+    },
+    {
+      "id": "gate-right",
+      "label": "gate-right",
+      "kind": "rectangle",
+      "x": 5.2,
+      "y": 0.58,
+      "width_m": 0.85,
+      "height_m": 0.5,
+      "radius_m": 0.25,
+      "rotation_deg": 0.0,
+      "appear_time_s": 0.0,
+      "disappear_time_s": null,
+      "vx_mps": 0.0,
+      "vy_mps": 0.0,
+      "active_by_default": true,
+      "opacity": 0.35
+    },
+    {
+      "id": "after-gate",
+      "label": "after-gate",
+      "kind": "rectangle",
+      "x": 7.4,
+      "y": 0.0,
+      "width_m": 0.45,
+      "height_m": 0.45,
+      "radius_m": 0.25,
+      "rotation_deg": 0.0,
+      "appear_time_s": 0.0,
+      "disappear_time_s": null,
+      "vx_mps": 0.0,
+      "vy_mps": 0.0,
+      "active_by_default": true,
+      "opacity": 0.35
+    }
+  ]
+}

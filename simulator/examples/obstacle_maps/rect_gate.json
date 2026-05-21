@@ -1,0 +1,50 @@
+{
+  "key": "rect_gate",
+  "title": "Ворота из прямоугольников",
+  "description": "Два стационарных прямоугольника образуют проверяемый проход.",
+  "bench_focus": "physical_rectangles",
+  "mission_length_m": 12.0,
+  "corridor_width_m": 2.4,
+  "obstacles": [
+    {
+      "id": "gate-upper",
+      "label": "gate-upper",
+      "kind": "rectangle",
+      "x": 5.76,
+      "y": 0.576,
+      "width_m": 0.8,
+      "height_m": 0.56,
+      "rotation_deg": 0.0,
+      "radius_m": 0.4,
+      "vertices": null,
+      "side_lengths_m": null,
+      "interior_angles_deg": null,
+      "appear_time_s": 0.0,
+      "disappear_time_s": null,
+      "vx_mps": 0.0,
+      "vy_mps": 0.0,
+      "active_by_default": true,
+      "opacity": 0.36
+    },
+    {
+      "id": "gate-lower",
+      "label": "gate-lower",
+      "kind": "rectangle",
+      "x": 5.76,
+      "y": -0.576,
+      "width_m": 0.8,
+      "height_m": 0.56,
+      "rotation_deg": 0.0,
+      "radius_m": 0.4,
+      "vertices": null,
+      "side_lengths_m": null,
+      "interior_angles_deg": null,
+      "appear_time_s": 0.0,
+      "disappear_time_s": null,
+      "vx_mps": 0.0,
+      "vy_mps": 0.0,
+      "active_by_default": true,
+      "opacity": 0.36
+    }
+  ]
+}

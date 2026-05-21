@@ -1,0 +1,84 @@
+{
+  "maps": [
+    {
+      "key": "clear_lane",
+      "title": "Пустая полоса / эталон",
+      "description": "Без препятствий: контроль длины 12 м и времени завершения.",
+      "bench_focus": "reference_completion",
+      "file": "obstacle_maps/clear_lane.json",
+      "obstacle_count": 0
+    },
+    {
+      "key": "single_gate",
+      "title": "Один прямоугольник и боковой проход",
+      "description": "Проверка одиночного обтекания и выбора верхнего/нижнего кластера.",
+      "bench_focus": "simple_bypass",
+      "file": "obstacle_maps/single_gate.json",
+      "obstacle_count": 1
+    },
+    {
+      "key": "two_gates",
+      "title": "Две шахматные заслонки",
+      "description": "Проверка плавного split/rejoin и личных маршрутов агентов.",
+      "bench_focus": "cluster_split_rejoin",
+      "file": "obstacle_maps/two_gates.json",
+      "obstacle_count": 2
+    },
+    {
+      "key": "rect_gate",
+      "title": "Ворота из прямоугольников",
+      "description": "Два стационарных прямоугольника образуют проверяемый проход.",
+      "bench_focus": "physical_rectangles",
+      "file": "obstacle_maps/rect_gate.json",
+      "obstacle_count": 2
+    },
+    {
+      "key": "central_block",
+      "title": "Центральный блок",
+      "description": "Один прямоугольник на оси полосы: тест выбора верх/низ.",
+      "bench_focus": "side_choice",
+      "file": "obstacle_maps/central_block.json",
+      "obstacle_count": 1
+    },
+    {
+      "key": "zigzag_rects",
+      "title": "Зигзаг прямоугольников",
+      "description": "Несколько прямоугольников заставляют рой менять сторону обхода.",
+      "bench_focus": "multi_bypass",
+      "file": "obstacle_maps/zigzag_rects.json",
+      "obstacle_count": 4
+    },
+    {
+      "key": "split_rejoin",
+      "title": "Split/rejoin",
+      "description": "Карта для разделения на верхний и нижний кластеры с последующим сбором.",
+      "bench_focus": "adaptive_clusters",
+      "file": "obstacle_maps/split_rejoin.json",
+      "obstacle_count": 4
+    },
+    {
+      "key": "narrow_slalom",
+      "title": "Узкий слалом",
+      "description": "Серия прямоугольников у краев полосы, провоцирует перестроение.",
+      "bench_focus": "corridor_constraints",
+      "file": "obstacle_maps/narrow_slalom.json",
+      "obstacle_count": 4
+    },
+    {
+      "key": "dynamic_popup",
+      "title": "Динамические pop-up препятствия",
+      "description": "Часть препятствий появляется и исчезает после старта миссии.",
+      "bench_focus": "local_perception_replanning",
+      "file": "obstacle_maps/dynamic_popup.json",
+      "obstacle_count": 4
+    },
+    {
+      "key": "mixed_circles_rects",
+      "title": "Смешанная карта: круги + прямоугольники",
+      "description": "Проверка разных геометрий препятствий в одном бенче.",
+      "bench_focus": "geometry_coverage",
+      "file": "obstacle_maps/mixed_circles_rects.json",
+      "obstacle_count": 4
+    }
+  ]
+}

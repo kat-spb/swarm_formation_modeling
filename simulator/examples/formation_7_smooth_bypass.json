@@ -1,0 +1,230 @@
+{
+  "name": "formation_7_smooth_bypass",
+  "mission_length_m": 12.0,
+  "corridor_width_m": 2.55,
+  "dt_s": 0.2,
+  "max_steps": 950,
+  "algorithm": "smooth_adaptive_clusters",
+  "grid_resolution_m": 0.12,
+  "seed": 42,
+  "formation": {
+    "name": "triangle_7",
+    "nodes": [
+      {
+        "id": "r01",
+        "name": "r01",
+        "x": 0.08142857142857143,
+        "y": -0.5171408839741362,
+        "powered": true
+      },
+      {
+        "id": "r02",
+        "name": "r02",
+        "x": -0.10857142857142857,
+        "y": -0.1880512305360495,
+        "powered": true
+      },
+      {
+        "id": "r03",
+        "name": "r03",
+        "x": 0.27142857142857146,
+        "y": -0.1880512305360495,
+        "powered": true
+      },
+      {
+        "id": "r04",
+        "name": "r04",
+        "x": -0.2985714285714286,
+        "y": 0.14103842290203716,
+        "powered": true
+      },
+      {
+        "id": "r05",
+        "name": "r05",
+        "x": 0.08142857142857143,
+        "y": 0.14103842290203716,
+        "powered": true
+      },
+      {
+        "id": "r06",
+        "name": "r06",
+        "x": 0.4614285714285714,
+        "y": 0.14103842290203716,
+        "powered": true
+      },
+      {
+        "id": "r07",
+        "name": "r07",
+        "x": -0.48857142857142866,
+        "y": 0.470128076340124,
+        "powered": true
+      }
+    ],
+    "distance_matrix": [
+      [
+        0.0,
+        0.38,
+        0.38,
+        0.76,
+        0.6581793068761733,
+        0.76,
+        1.1400000000000001
+      ],
+      [
+        0.38,
+        0.0,
+        0.38,
+        0.38,
+        0.38,
+        0.6581793068761733,
+        0.7600000000000001
+      ],
+      [
+        0.38,
+        0.38,
+        0.0,
+        0.6581793068761734,
+        0.38,
+        0.37999999999999995,
+        1.0053854982045445
+      ],
+      [
+        0.76,
+        0.38,
+        0.6581793068761734,
+        0.0,
+        0.38,
+        0.76,
+        0.38000000000000017
+      ],
+      [
+        0.6581793068761733,
+        0.38,
+        0.38,
+        0.38,
+        0.0,
+        0.38,
+        0.6581793068761735
+      ],
+      [
+        0.76,
+        0.6581793068761733,
+        0.37999999999999995,
+        0.76,
+        0.38,
+        0.0,
+        1.0053854982045445
+      ],
+      [
+        1.1400000000000001,
+        0.7600000000000001,
+        1.0053854982045445,
+        0.38000000000000017,
+        0.6581793068761735,
+        1.0053854982045445,
+        0.0
+      ]
+    ],
+    "tolerance_m": 0.095,
+    "edge_tolerance_m": 0.08360000000000001,
+    "locked_edges": [],
+    "assignment_mode": "identity"
+  },
+  "n_agents": 7,
+  "formation_shape": "triangle",
+  "formation_spacing_m": 0.38,
+  "random_obstacles": false,
+  "random_obstacle_count": 0,
+  "perception": {
+    "mode": "local",
+    "shared_memory": true,
+    "obstacle_memory_s": 18.0,
+    "comms_range_m": 4.0,
+    "broadcast_obstacles": true,
+    "broadcast_positions": true
+  },
+  "objective": {
+    "completion_policy": "finish_first",
+    "collective_goal_weight": 1.0,
+    "agent_survival_weight": 1.0,
+    "final_place_weight": 1.0,
+    "energy_weight": 0.2,
+    "time_weight": 0.25,
+    "centroid_length_weight": 0.25,
+    "allow_reassignment": false,
+    "require_all_powered_agents": true,
+    "success_requires_formation": true,
+    "success_requires_no_collision": false
+  },
+  "limits": {
+    "safety_margin_m": 0.055,
+    "robot_robot_margin_m": 0.04,
+    "obstacle_margin_m": 0.05,
+    "replan_period_steps": 3,
+    "max_reconfig_speed_mps": 0.3,
+    "smooth_reconfiguration": true,
+    "setpoint_smoothing_alpha": 0.7,
+    "setpoint_max_rate_mps": 0.55,
+    "min_route_lookahead_m": 0.3,
+    "route_preview_points": 28,
+    "agent_trail_points": 140,
+    "cluster_hysteresis_steps": 2,
+    "avoidance_horizon_s": 1.2,
+    "enable_safety_filter": true,
+    "allow_reverse": true,
+    "stop_if_no_path": false
+  },
+  "obstacles": [
+    {
+      "id": "smooth-block-center",
+      "label": "smooth-block-center",
+      "kind": "rectangle",
+      "x": 4.2,
+      "y": 0.0,
+      "width_m": 0.68,
+      "height_m": 0.7,
+      "radius_m": 0.25,
+      "rotation_deg": 0.0,
+      "appear_time_s": 0.0,
+      "disappear_time_s": null,
+      "vx_mps": 0.0,
+      "vy_mps": 0.0,
+      "active_by_default": true,
+      "opacity": 0.35
+    },
+    {
+      "id": "smooth-upper",
+      "label": "smooth-upper",
+      "kind": "rectangle",
+      "x": 6.15,
+      "y": 0.43,
+      "width_m": 0.72,
+      "height_m": 0.52,
+      "radius_m": 0.25,
+      "rotation_deg": 0.0,
+      "appear_time_s": 0.0,
+      "disappear_time_s": null,
+      "vx_mps": 0.0,
+      "vy_mps": 0.0,
+      "active_by_default": true,
+      "opacity": 0.35
+    },
+    {
+      "id": "smooth-lower",
+      "label": "smooth-lower",
+      "kind": "rectangle",
+      "x": 7.75,
+      "y": -0.42,
+      "width_m": 0.58,
+      "height_m": 0.56,
+      "radius_m": 0.25,
+      "rotation_deg": 0.0,
+      "appear_time_s": 0.0,
+      "disappear_time_s": null,
+      "vx_mps": 0.0,
+      "vy_mps": 0.0,
+      "active_by_default": true,
+      "opacity": 0.35
+    }
+  ]
+}
